@@ -1,12 +1,6 @@
 import socketserver
 import sys
 import json
-from pymongo import MongoClient
-
-mongo_client = MongoClient("mongo")
-db = mongo_client["cse312_project"]
-user_collection = db["users"]
-user_id_collection = db["user_id"]
 
 
 class TCPHandler(socketserver.BaseRequestHandler):
