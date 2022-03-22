@@ -5,11 +5,11 @@ services:
     links:
       - database
     ports:
-      - "8080:8000"
+      - "8080:5000"
 
   database:
     image: mysql:8.0.13
-    container_name: "cse312project_db"
+    container_name: "cse312_db"
     ports:
       - "8000:3306"
     environment:
