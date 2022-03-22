@@ -1,6 +1,20 @@
-version: '3.3'
+version: "3.3"
 services:
   app:
     build: .
+    links:
+      - database
     ports:
-      - '8080:8000'
+      - "8080:8000"
+
+  database:
+    image: mysql:8.0.13
+    container_name: "cse312project_db"
+    ports:
+      - "8000:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # MYSQL_PASSWORD: root
+      # MYSQL_DATABASE: cse312project
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/:ro
