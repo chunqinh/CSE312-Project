@@ -1,0 +1,233 @@
+.homepagewvoting-creator-container {
+  width: 100%;
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.homepagewvoting-creator-container1 {
+  top: 10%;
+  right: 0px;
+  width: 30%;
+  bottom: 0px;
+  height: 90%;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: #ececec;
+}
+.homepagewvoting-creator-ul {
+  top: 10%;
+  left: 0px;
+  height: 90%;
+  position: absolute;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.homepagewvoting-creator-text03 {
+  top: 38px;
+  left: 14px;
+  position: absolute;
+}
+.homepagewvoting-creator-container2 {
+  top: 10%;
+  flex: 0 0 auto;
+  left: 0px;
+  width: 70%;
+  bottom: 0px;
+  height: 90%;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  border-color: rgba(120, 120, 120, 0.4);
+  border-style: hidden;
+  border-width: 2px;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.homepagewvoting-creator-container3 {
+  left: 0px;
+  right: 0px;
+  width: 100%;
+  bottom: 0px;
+  height: 55%;
+  margin: auto;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+}
+.homepagewvoting-creator-button {
+  top: 75%;
+  left: 0px;
+  right: 0px;
+  width: 566px;
+  height: 10%;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text04 {
+  top: 9px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-button1 {
+  top: 45%;
+  left: 0px;
+  right: 0px;
+  width: 566px;
+  height: 10%;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text05 {
+  top: 13px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-button2 {
+  top: 60%;
+  left: 0px;
+  right: 0px;
+  width: 566px;
+  height: 10%;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text06 {
+  top: 8px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-button3 {
+  top: 30%;
+  left: 0px;
+  right: 0px;
+  width: 566px;
+  height: 10%;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text07 {
+  top: 8px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-button4 {
+  top: 15%;
+  left: 0px;
+  right: 0px;
+  width: 566px;
+  height: 10%;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text08 {
+  top: 8px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-text09 {
+  top: 5%;
+  left: 40%;
+  right: 40%;
+  margin: auto;
+  position: absolute;
+  text-align: center;
+}
+.homepagewvoting-creator-container4 {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 45%;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+}
+.homepagewvoting-creator-container5 {
+  top: 40%;
+  left: 45%;
+  width: 45%;
+  height: 45%;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+}
+.homepagewvoting-creator-text10 {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  margin: auto;
+  position: absolute;
+}
+.homepagewvoting-creator-text11 {
+  top: 15%;
+  left: 45%;
+  width: 50%;
+  position: absolute;
+}
+.homepagewvoting-creator-image {
+  top: 15%;
+  left: 5%;
+  width: 35%;
+  height: 70%;
+  position: absolute;
+  object-fit: cover;
+}
+.homepagewvoting-creator-text12 {
+  top: 30%;
+  left: 45%;
+  width: 50%;
+  position: absolute;
+}
+.homepagewvoting-creator-button5 {
+  top: 3%;
+  right: 3%;
+  width: 105px;
+  position: absolute;
+}
+.homepagewvoting-creator-container6 {
+  top: 0px;
+  flex: 0 0 auto;
+  left: 0px;
+  width: 100%;
+  height: 10%;
+  display: flex;
+  position: absolute;
+  align-items: flex-start;
+  border-color: var(--dl-color-gray-black);
+  border-style: dashed;
+  border-width: 1px;
+}
+.homepagewvoting-creator-text13 {
+  top: 51px;
+  right: 61px;
+  position: absolute;
+  font-size: 20px;
+  text-transform: capitalize;
+}
+.homepagewvoting-creator-image1 {
+  top: 21px;
+  left: 27px;
+  width: 4%;
+  position: absolute;
+  object-fit: cover;
+}

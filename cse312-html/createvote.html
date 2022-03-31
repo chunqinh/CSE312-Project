@@ -2,7 +2,8 @@
 
 <html lang="en">
   <head>
-    <title>cse312</title>
+    <title>create vote - cse312</title>
+    <meta property="og:title" content="create vote - cse312" />
     <meta property="og:title" content="cse312" />
     <meta property="og:title" content="sign up - cse312" />
     <meta property="og:title" content="Homepage after voting - cse312" />
@@ -49,33 +50,67 @@
   </head>
   <body>
     <div>
-      <link href="./login.css" rel="stylesheet" />
+      <link href="./createvote.css" rel="stylesheet" />
 
-      <div class="login-container">
-        <form class="login-form">
-          <h2 class="login-heading"><span class="login-text">Login</span></h2>
+      <div class="createvote-container">
+        <form class="createvote-form">
+          <button class="createvote-create-button button">
+            <span class="createvote-text">
+              <span class="createvote-text01">Upload Your</span>
+              <br />
+              <span class="createvote-text03">Picture Here!</span>
+            </span>
+          </button>
+          <h2 class="createvote-heading">
+            <span class="createvote-text04">Create an New Voting</span>
+          </h2>
           <input
             type="text"
-            placeholder="placeholder"
-            class="login-password input"
+            placeholder="Voting name"
+            class="createvote-password input"
           />
           <input
             type="text"
-            placeholder="placeholder"
-            class="login-password1 input"
+            placeholder="Option 1"
+            class="createvote-password1 input"
           />
-          <span class="login-text1">Username</span>
-          <span class="login-sign-up-text">Sign up for free</span>
-          <span class="login-text2">Password</span>
-          <button class="login-login-button button">
-            <span class="login-text3"><span>Login</span></span>
+          <textarea
+            placeholder="placeholder"
+            class="createvote-textarea textarea"
+          ></textarea>
+          <input
+            type="text"
+            placeholder="Option 4 (optional)"
+            class="createvote-password2 input"
+          />
+          <input
+            type="text"
+            placeholder="Option 2"
+            class="createvote-password3 input"
+          />
+          <input
+            type="text"
+            placeholder="Option 3 (optional)"
+            class="createvote-password4 input"
+          />
+          <input
+            type="text"
+            placeholder="Option 5 (optional)"
+            class="createvote-password5 input"
+          />
+          <span class="createvote-text05">Voting name</span>
+          <span class="createvote-text06"><span>Description</span></span>
+          <span class="createvote-text08">Options</span>
+          <button class="createvote-login-button button">
+            <span class="createvote-text09">Create</span>
           </button>
         </form>
-        <div class="login-container1">
+        <div class="createvote-container1">
+          <span class="createvote-text10">Username</span>
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
-            class="login-image"
+            class="createvote-image"
           />
         </div>
       </div>
