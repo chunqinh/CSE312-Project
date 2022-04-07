@@ -50,6 +50,7 @@
   top: 30px;
   left: 0px;
   color: #000000;
+  border-color: #000000;
   right: 0px;
   width: 480px;
   height: 44px;
@@ -96,6 +97,7 @@
   margin: auto;
   display: flex;
   position: absolute;
+  background-color: white;
   box-shadow: 5px 5px 10px 0px #a69f9f;
   text-align: center;
   padding-left: 1px;
