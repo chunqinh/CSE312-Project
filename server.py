@@ -18,14 +18,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
         recievedData = self.request.recv(2048).strip()
         print(recievedData)
 
-        if "GET".encode() in recievedData and "/signup".encode() in recievedData:
+        if "GET".encode() in recievedData and "/ ".encode() in recievedData:
             file_size_html = os.path.getsize('cse312-html/signup.html')
             file_html = open("cse312-html/signup.html", "r")
             read_html = file_html.read()
             frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(len(read_html.encode())) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
             self.request.sendall(frontend.encode())
 
-        elif "GET".encode() in recievedData and "/ ".encode() in recievedData:
+        elif "GET".encode() in recievedData and "/login ".encode() in recievedData:
             file_size_html = os.path.getsize('cse312-html/login.html')
             file_html = open("cse312-html/login.html", "r")
             read_html = file_html.read()
