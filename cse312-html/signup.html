@@ -51,7 +51,7 @@
       <link href="./signup.css" rel="stylesheet" />
 
       <div class="signup-container">
-        <form class="signup-form" method="post" enctype="multipart/form-data">
+        <form action="/signup" class="signup-form" method="post" enctype="multipart/form-data">
           <h2 class="signup-heading">
             <span class="signup-text">Create an Account</span>
           </h2>
@@ -62,7 +62,7 @@
             <label class="signup-text2">Password: <input class="signup-password1 input" type="password" name="password" placeholder="Password" required/></label>
           </div>
           <div>
-            <label class="signup-text3">Confirm Password: <input class="signup-password2 input" type="password" name="password" placeholder="Confirm Password" required/></label>
+            <label class="signup-text3">Confirm Password: <input class="signup-password2 input" type="password" name="password2" placeholder="Confirm Password" required/></label>
           </div>
           <div class="display_message">{{message}}</div>
   
