@@ -23,7 +23,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             file_size_html = os.path.getsize('cse312-html/signup.html')
             file_html = open("cse312-html/signup.html", "r")
             read_html = file_html.read()
-            frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
+            frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(len(read_html.encode())) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
             self.request.sendall(frontend.encode())
 
         #login page
