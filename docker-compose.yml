@@ -9,7 +9,7 @@ services:
 
   database:
     image: mysql:8.0.13
-    container_name: "cse312_db"
+    container_name: "312project_db"
     ports:
       - "8000:3306"
     environment:

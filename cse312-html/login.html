@@ -5,8 +5,8 @@
     <title>cse312</title>
     <meta property="og:title" content="cse312" />
     <meta property="og:title" content="sign up - cse312" />
+    <meta property="og:title" content="Homepage after voting - cse312" />
     <meta property="og:title" content="chat page - cse312" />
-    <meta property="og:title" content="change password - cse312" />
     <meta property="og:title" content="profile - cse312" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,6 +35,14 @@
     </style>
     <link
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
     />
     <link rel="stylesheet" href="./style.css" />
@@ -44,9 +52,9 @@
       <link href="./login.css" rel="stylesheet" />
 
       <div class="login-container">
-        <form action="/login" class="login-form" method="post">
+        <form action="/login" class="login-form" method="post" enctype="multipart/form-data">
           <h2 class="login-heading"><span class="login-text">Login</span></h2>
-          <input
+          <!-- <input
             type="text"
             placeholder="placeholder"
             class="login-password input"
@@ -55,21 +63,30 @@
             type="text"
             placeholder="placeholder"
             class="login-password1 input"
-          />
-          <span class="login-text1">Username</span>
+          /> -->
+          <div>
+            <label class="login">Username: <input type="text" name="username" placeholder="Username" required/></label>
+          </div>
+          <div>
+            <label class="login">Password: <input type="password" name="password" placeholder="Password" required/></label>
+          </div>
+          <div class="display_message">{{message}}</div>
+  
+          <input type="submit" value="Login">
+          <!-- <span class="login-text1">Username</span>
           <span class="login-sign-up-text">Sign up for free</span>
           <span class="login-text2">Password</span>
           <button class="login-login-button button">
             <span class="login-text3"><span>Login</span></span>
-          </button>
+          </button> -->
         </form>
-        <header data-role="Header" class="login-header">
+        <div class="login-container1">
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
             class="login-image"
           />
-        </header>
+        </div>
       </div>
     </div>
   </body>

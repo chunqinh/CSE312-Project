@@ -2,9 +2,7 @@
 
 <html lang="en">
   <head>
-    <title>sign up - cse312</title>
-    <meta property="og:title" content="sign up - cse312" />
-    <meta property="og:title" content="Homepage after voting - cse312" />
+    <title>chat page - cse312</title>
     <meta property="og:title" content="chat page - cse312" />
     <meta property="og:title" content="profile - cse312" />
 
@@ -48,52 +46,24 @@
   </head>
   <body>
     <div>
-      <link href="./signup.css" rel="stylesheet" />
+      <link href="./chatpage.css" rel="stylesheet" />
 
-      <div class="signup-container">
-        <form class="signup-form" method="post" enctype="multipart/form-data">
-          <h2 class="signup-heading">
-            <span class="signup-text">Create an Account</span>
-          </h2>
-          <div>
-            <label class="signup-text1">Username: <input class="signup-password input" type="text" name="username" placeholder="Username" required/></label>
-          </div>
-          <div>
-            <label class="signup-text2">Password: <input class="signup-password1 input" type="password" name="password" placeholder="Password" required/></label>
-          </div>
-          <div>
-            <label class="signup-text3">Confirm Password: <input class="signup-password2 input" type="password" name="password" placeholder="Confirm Password" required/></label>
-          </div>
-          <div class="display_message">{{message}}</div>
-  
-          <input  class="signup-text4" type="submit" value="Join Now">
-          <!-- <input
-            type="text"
-            placeholder="placeholder"
-            class="signup-password input"
-          />
+      <div class="chatpage-container">
+        <form class="chatpage-form">
+          <button class="chatpage-button button"><span>Send</span></button>
           <input
             type="text"
             placeholder="placeholder"
-            class="signup-password1 input"
+            class="chatpage-textinput input"
           />
-          <input
-            type="text"
-            placeholder="placeholder"
-            class="signup-password2 input"
-          />
-          <span class="signup-text1">Username</span>
-          <span class="signup-text2">Password</span>
-          <span class="signup-text3">Confirm Password</span>
-          <button class="signup-login-button button">
-            <span class="signup-text4">Join Now</span>
-          </button> -->
+          <div class="chatpage-container1"></div>
         </form>
-        <div class="signup-container1">
+        <div class="chatpage-container2">
+          <span class="chatpage-text1">Username</span>
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
-            class="signup-image"
+            class="chatpage-image"
           />
         </div>
       </div>

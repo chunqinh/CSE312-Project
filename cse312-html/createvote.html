@@ -2,7 +2,9 @@
 
 <html lang="en">
   <head>
-    <title>sign up - cse312</title>
+    <title>create vote - cse312</title>
+    <meta property="og:title" content="create vote - cse312" />
+    <meta property="og:title" content="cse312" />
     <meta property="og:title" content="sign up - cse312" />
     <meta property="og:title" content="Homepage after voting - cse312" />
     <meta property="og:title" content="chat page - cse312" />
@@ -48,52 +50,67 @@
   </head>
   <body>
     <div>
-      <link href="./signup.css" rel="stylesheet" />
+      <link href="./createvote.css" rel="stylesheet" />
 
-      <div class="signup-container">
-        <form class="signup-form" method="post" enctype="multipart/form-data">
-          <h2 class="signup-heading">
-            <span class="signup-text">Create an Account</span>
+      <div class="createvote-container">
+        <form class="createvote-form">
+          <button class="createvote-create-button button">
+            <span class="createvote-text">
+              <span class="createvote-text01">Upload Your</span>
+              <br />
+              <span class="createvote-text03">Picture Here!</span>
+            </span>
+          </button>
+          <h2 class="createvote-heading">
+            <span class="createvote-text04">Create an New Voting</span>
           </h2>
-          <div>
-            <label class="signup-text1">Username: <input class="signup-password input" type="text" name="username" placeholder="Username" required/></label>
-          </div>
-          <div>
-            <label class="signup-text2">Password: <input class="signup-password1 input" type="password" name="password" placeholder="Password" required/></label>
-          </div>
-          <div>
-            <label class="signup-text3">Confirm Password: <input class="signup-password2 input" type="password" name="password" placeholder="Confirm Password" required/></label>
-          </div>
-          <div class="display_message">{{message}}</div>
-  
-          <input  class="signup-text4" type="submit" value="Join Now">
-          <!-- <input
+          <input
             type="text"
-            placeholder="placeholder"
-            class="signup-password input"
+            placeholder="Voting name"
+            class="createvote-password input"
           />
           <input
             type="text"
+            placeholder="Option 1"
+            class="createvote-password1 input"
+          />
+          <textarea
             placeholder="placeholder"
-            class="signup-password1 input"
+            class="createvote-textarea textarea"
+          ></textarea>
+          <input
+            type="text"
+            placeholder="Option 4 (optional)"
+            class="createvote-password2 input"
           />
           <input
             type="text"
-            placeholder="placeholder"
-            class="signup-password2 input"
+            placeholder="Option 2"
+            class="createvote-password3 input"
           />
-          <span class="signup-text1">Username</span>
-          <span class="signup-text2">Password</span>
-          <span class="signup-text3">Confirm Password</span>
-          <button class="signup-login-button button">
-            <span class="signup-text4">Join Now</span>
-          </button> -->
+          <input
+            type="text"
+            placeholder="Option 3 (optional)"
+            class="createvote-password4 input"
+          />
+          <input
+            type="text"
+            placeholder="Option 5 (optional)"
+            class="createvote-password5 input"
+          />
+          <span class="createvote-text05">Voting name</span>
+          <span class="createvote-text06"><span>Description</span></span>
+          <span class="createvote-text08">Options</span>
+          <button class="createvote-login-button button">
+            <span class="createvote-text09">Create</span>
+          </button>
         </form>
-        <div class="signup-container1">
+        <div class="createvote-container1">
+          <span class="createvote-text10">Username</span>
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
-            class="signup-image"
+            class="createvote-image"
           />
         </div>
       </div>
