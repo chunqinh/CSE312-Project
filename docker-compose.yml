@@ -8,7 +8,9 @@ services:
       - "8080:8000"
 
   database:
-    image: mysql:8.0.13
+    platform: linux/x86_64
+    image: mysql:5.7
+    # image: mysql:8.0.13
     container_name: "312project_db"
     ports:
       - "8000:3306"
