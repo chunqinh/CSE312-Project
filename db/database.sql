@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `password` VARCHAR(99) NOT NULL,
     `is_online` BOOLEAN,
     `username_color` VARCHAR(99) ,
-    `bio` VARCHAR(99) NOT NULL,
+    `bio` VARCHAR(99),
     PRIMARY KEY (`username`)
 );
 
