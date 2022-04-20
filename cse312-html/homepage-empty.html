@@ -68,15 +68,51 @@
             <span class="homepage-empty-text4">Create a New Voting</span>
           </button>
         </main>
+
         <div class="homepage-empty-container3">
-          <span class="homepage-empty-text5" >{{username}}</span>
+
+          <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn" >{{username}}</button>
+            <div id="myDropdown" class="dropdown-content">
+              <a href="/profile">Profile</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+          </div>
+
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
             class="homepage-empty-image"
           />
         </div>
+
+        </div>
       </div>
     </div>
+
+
+    <script>
+      /* When the user clicks on the button, 
+      toggle between hiding and showing the dropdown content */
+      function myFunction() {
+        document.getElementById("myDropdown").classList.toggle("show");
+      }
+      
+      // Close the dropdown if the user clicks outside of it
+      window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+          var dropdowns = document.getElementsByClassName("dropdown-content");
+          var i;
+          for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+            }
+          }
+        }
+      }
+      </script>
+
   </body>
 </html>

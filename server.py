@@ -63,6 +63,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
                 self.request.sendall(response)
 
+            elif splitData[1] == "/profile_edit":
+                file_size_html = os.path.getsize('cse312-html/profile_edit.html')
+                file_html = open("cse312-html/profile_edit.html", "r")
+                read_html = file_html.read()
+                frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
+                self.request.sendall(frontend.encode())
+
+
             # login page
             elif splitData[1] == "/":
                 file_size_html = os.path.getsize('cse312-html/login.html')
