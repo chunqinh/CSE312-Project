@@ -36,7 +36,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
             elif ".css" in splitData[1]:
             
                 # split = recievedData.decode().split(' ')
-                # print("---------------------------------------------",split[1])
+                print("---------------------------------------------",splitData[1])
 
                 css_path = 'cse312-html' + splitData[1]
                 file_size_css = os.path.getsize(css_path)

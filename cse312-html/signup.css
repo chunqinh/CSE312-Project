@@ -36,64 +36,66 @@
 .signup-text {
   text-align: center;
 }
-.signup-password {
-  top: 115px;
-  left: 61px;
+.username_input {
+  top: 30px;
+  left: 0px;
   color: #000000;
-  width: 80%;
-  height: 10%;
+  width: 480px;
+  height: 44px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.signup-password1 {
-  top: 198px;
-  left: 62px;
+.password_input {
+  top: 30px;
+  left: 0px;
   color: #000000;
-  width: 80%;
-  height: 10%;
+  width: 480px;
+  height: 44px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.signup-password2 {
-  top: 286px;
-  left: 63px;
+.comfirm_pass_input {
+  top: 30px;
+  left: 0px;
   color: #000000;
-  width: 80%;
-  height: 10%;
+  width: 480px;
+  height:44px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.signup-text1 {
+.username_label {
   top: 88px;
-  left: 64px;
+  left: 63px;
   position: absolute;
   font-size: 18px;
   font-weight: 400;
   text-transform: capitalize;
 }
-.signup-text2 {
+.password_label {
   top: 172px;
   left: 63px;
   position: absolute;
   font-size: 18px;
 }
-.signup-text3 {
+.comfirm_pass_label {
   top: 262px;
   left: 65px;
   position: absolute;
   font-size: 18px;
 }
 .signup-login-button {
-  left: 252px;
+  top: 370px;
+  left: 0px;
+  right: 0px;
   width: 15%;
-  bottom: 40px;
-  height: 8%;
+  height: 40px;
   margin: auto;
   display: flex;
   position: absolute;
+  background-color: white;
   box-shadow: 5px 5px 10px 0px #a69f9f;
   text-align: center;
   padding-left: 1px;
