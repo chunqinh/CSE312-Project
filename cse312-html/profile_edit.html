@@ -45,23 +45,28 @@
   </head>
   <body>
     <div>
-      <link href="./profile.css" rel="stylesheet" />
+      <link href="./profile_edit.css" rel="stylesheet" />
 
       <div class="profile-container">
         <form class="profile-form">
           <h2 class="profile-heading">Profile</h2>
           
-          <span class="profile-text">Username:</span>
+          <span class="profile-text">Username: </span>
+          <span class="username_input">{{username}}</span>
           <!-- <span class="profile-text01"><span>Password:</span></span> -->
-          <span class="profile-text01">Bio:</span>
-          <button class="profile-login-button button">
-            <span class="profile-text04">Edit</span>
-          </button>
-          <span class="profile-text03">Username Color:</span>
-          <span class="profile-text06">{{username}}</span>
+          <label class="profile-text01">Bio:
+            <input class="bio_input input" type="text"/>
+          </label>
+          
+          <label class="profile-text03">Username Color:
+            <input class="user_color_input " type="color" id="favcolor" name="favcolor" value="{{#ff0000}}">
+          </label>
+        
           <!-- <span class="profile-text07">Text</span> -->
-          <span class="profile-text07">{{bio}}</span>
-          <span class="profile-text08">{{username color}}</span>
+         
+          <button class="profile-login-button button" type="submit">
+            <span class="profile-text04">Submit</span>
+          </button>
 
         </form>
         <div class="profile-container1">
