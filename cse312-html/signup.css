@@ -13,14 +13,14 @@
   list-style-position: outside;
 }
 .signup-form {
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  width: 591px;
-  bottom: 5%;
-  height: 443px;
+  top: 30%;
+  left: 25%;
+  right: 25%;
+  width: 600px;
+  height: 382px;
   margin: auto;
   position: absolute;
+  align-self: center;
   border-color: var(--dl-color-gray-black);
   border-width: 1px;
   border-radius: var(--dl-radius-radius-radius4);
