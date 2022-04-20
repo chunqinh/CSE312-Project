@@ -51,12 +51,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # profile page
             elif splitData[1] == "/profile":
-                bio='bio'
-                color = 'color'
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username_color, bio FROM user WHERE username = %s', (TCPHandler.username,))
+                info = cursor.fetchone()
+                bio=info[1]
+                color = info[0]
+                # color = 'blue'
+
                 content = TCPHandler.render_template("cse312-html/profile.html", {"bio":bio, "username color":color, "username": TCPHandler.username})
                 response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
                 self.request.sendall(response)
-
 
             # login page
             elif splitData[1] == "/":
