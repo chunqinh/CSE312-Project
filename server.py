@@ -49,6 +49,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
                 self.request.sendall(response)
 
+            # profile page
+            elif splitData[1] == "/profile":
+                bio='bio'
+                color = 'color'
+                content = TCPHandler.render_template("cse312-html/profile.html", {"bio":bio, "username color":color, "username": TCPHandler.username})
+                response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
+                self.request.sendall(response)
+
+
             # login page
             elif splitData[1] == "/":
                 file_size_html = os.path.getsize('cse312-html/login.html')
@@ -188,7 +197,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
     # functions to generate html template
     def render_template(html_filename, data):
-        file_html = open("cse312-html/homepage-empty.html", "r")
+        file_html = open(html_filename, "r")
         read_html = file_html.read()
 
         template = read_html
