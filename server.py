@@ -45,7 +45,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
             
             # empty homepage
             elif splitData[1] == "/homepage":
-                content = TCPHandler.render_template("cse312-html/homepage-empty.html", {"username": TCPHandler.username})
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                info = cursor.fetchone()
+                color = info[0]
+                content = TCPHandler.render_template("cse312-html/homepage-empty.html", {"username": TCPHandler.username,"username color":color})
                 response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
                 self.request.sendall(response)
 
@@ -57,7 +62,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 info = cursor.fetchone()
                 bio=info[1]
                 color = info[0]
-                # color = 'blue'
 
                 content = TCPHandler.render_template("cse312-html/profile.html", {"bio":bio, "username color":color, "username": TCPHandler.username})
                 response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
@@ -194,6 +198,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 else:
                     TCPHandler.username = insert_username
                     self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                
+            elif splitData[1] ==  "/profile":
+
+                new_bio =''
+                new_color =''
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                update_query = """UPDATE user SET username_color = %s AND bio = %s WHERE username = %s;"""
+                val = (new_color, new_bio,TCPHandler.username)
+                cursor.execute(update_query, val)
+                cursor.connection.commit()
+                cursor.close()
+                self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
+
 
             sys.stdout.flush()
             sys.stderr.flush()
