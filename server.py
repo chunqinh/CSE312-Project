@@ -68,11 +68,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(response)
 
             elif splitData[1] == "/profile_edit":
-                file_size_html = os.path.getsize('cse312-html/profile_edit.html')
-                file_html = open("cse312-html/profile_edit.html", "r")
-                read_html = file_html.read()
-                frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
-                self.request.sendall(frontend.encode())
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                info = cursor.fetchone()
+                color = info[0]
+                content = TCPHandler.render_template("cse312-html/profile_edit.html", {"username": TCPHandler.username,"username color":color})
+                response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
+                self.request.sendall(response)
+
+                # file_size_html = os.path.getsize('cse312-html/profile_edit.html')
+                # file_html = open("cse312-html/profile_edit.html", "r")
+                # read_html = file_html.read()
+                # frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
+                # self.request.sendall(frontend.encode())
 
 
             # login page
@@ -198,17 +207,47 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 else:
                     TCPHandler.username = insert_username
                     self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+            
+            # profile edit post 
+            elif splitData[1] ==  "/profile_edit":
+                print(recievedData)
                 
-            elif splitData[1] ==  "/profile":
-
-                new_bio =''
+                header = recievedData.find(b'\r\n\r\n')
+                head = recievedData[0:header]
+                new_line = head.split(b'\r\n')
+                start_boundary = b'boundary'
+                for x in new_line:
+                    if start_boundary in x:
+                        start = x.find(start_boundary)
+                        need_boundary = x[start + len(start_boundary)+1:] #boundary=
+                boundary = b"--" + need_boundary # -- + boundary
+                body = recievedData[header + len(b'\r\n\r\n'):]
+                body_lst = body.split(boundary + b'\r\n') # split using boundary
+                start_bio = b'"bio"\r\n\r\n'
+                start_color = b'"color"\r\n\r\n'
+                new_bio = ''
                 new_color =''
+                for x in body_lst:
+                    if start_bio in x:
+                        start_index_bio = x.find(start_bio)
+                        need_bio = x[start_index_bio + len(start_bio):]
+                        size_bio = len(need_bio)
+                        new_bio = need_bio[:size_bio - len(b'\r\n')].decode()
+                        
+                    elif start_color in x:
+                        start_index_color = x.find(start_color)
+                        need_color = x[start_index_color + len(start_color):]
+                        size_color = len(need_color)
+                        last_boundary = b'\r\n' + boundary + b'--' # \r\n-- + boundary + --
+                        new_color = need_color[:size_color - len(last_boundary)].decode()
+
+                print(new_bio)
+                print(new_color)
+
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                update_query = """UPDATE user SET username_color = %s AND bio = %s WHERE username = %s;"""
-                val = (new_color, new_bio,TCPHandler.username)
-                cursor.execute(update_query, val)
-                cursor.connection.commit()
+                cursor.execute("UPDATE user SET bio = %s,username_color = %s WHERE username = %s", (new_bio,new_color,TCPHandler.username))
+                connection.commit()
                 cursor.close()
                 self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
 
