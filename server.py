@@ -6,6 +6,7 @@ import mysql.connector
 
 
 class TCPHandler(socketserver.BaseRequestHandler):
+    username=''
     
     config = {
     'user': 'root',
@@ -32,11 +33,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
                 self.request.sendall(frontend.encode())
 
-        # login page
+            # load css 
             elif ".css" in splitData[1]:
-            
-                # split = recievedData.decode().split(' ')
-                print("---------------------------------------------",splitData[1])
 
                 css_path = 'cse312-html' + splitData[1]
                 file_size_css = os.path.getsize(css_path)
@@ -45,6 +43,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 style = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_css) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_css
                 self.request.sendall(style.encode())
             
+            # empty homepage
+            elif splitData[1] == "/homepage":
+                content = TCPHandler.render_template("cse312-html/homepage-empty.html", {"username": TCPHandler.username})
+                response = TCPHandler.generate_response(content.encode(), "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff", "200 OK")
+                self.request.sendall(response)
+
+            # login page
             elif splitData[1] == "/":
                 file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
@@ -125,7 +130,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
         #login
             elif splitData[1] ==  "/login":
                 print(recievedData)
-                print("hello")
                 header = recievedData.find(b'\r\n\r\n')
                 head = recievedData[0:header]
                 new_line = head.split(b'\r\n')
@@ -136,7 +140,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_boundary = x[start + len(start_boundary)+1:] #boundary=
                 boundary = b"--" + need_boundary # -- + boundary
                 body = recievedData[header + len(b'\r\n\r\n'):]
-                print(body)
                 body_lst = body.split(boundary + b'\r\n') # split using boundary
                 start_username = b'"username"\r\n\r\n'
                 start_password = b'"password"\r\n\r\n'
@@ -163,12 +166,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 cursor = connection.cursor()
                 cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s', (insert_username, insert_password))
                 account = cursor.fetchone()
-                print(account)
                 if not account:
                     invaild = "Wrong Password or Account doesn't exist"
                     self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(len(invaild)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + invaild).encode())
                 else:
-                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: / \r\n\r\n".encode())
+                    TCPHandler.username = insert_username
+                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
 
             sys.stdout.flush()
             sys.stderr.flush()
@@ -181,6 +184,57 @@ class TCPHandler(socketserver.BaseRequestHandler):
     #     read_css = file_css.read()
     #     style = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_css) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_css
     #     self.request.sendall(style.encode())
+    
+
+    # functions to generate html template
+    def render_template(html_filename, data):
+        file_html = open("cse312-html/homepage-empty.html", "r")
+        read_html = file_html.read()
+
+        template = read_html
+        template = TCPHandler.replace_placeholders(template, data)
+        # template = TCPHandler.render_loop(template, data)
+        
+        return template
+
+
+    def replace_placeholders(template, data):
+
+        replaced_template = template
+        for placeholder in data.keys():
+            if isinstance(data[placeholder], str):
+                replaced_template = replaced_template.replace("{{" + placeholder + "}}", data[placeholder])
+        return replaced_template
+
+
+    def render_loop(template, data):
+        if "loop_data" in data:
+            loop_start_tag = "{{loop}}"
+            loop_end_tag = "{{end_loop}}"
+
+            start_index = template.find(loop_start_tag)
+            end_index = template.find(loop_end_tag)
+
+            loop_template = template[start_index + len(loop_start_tag): end_index]
+            loop_data = data["loop_data"]
+
+            loop_content = ""
+            for single_piece_of_content in loop_data:
+                loop_content += TCPHandler.replace_placeholders(loop_template, single_piece_of_content)
+
+            final_content = template[:start_index] + loop_content + template[end_index + len(loop_end_tag):]
+
+            return final_content
+    
+    # generate response 
+    def generate_response(body: bytes, content_type: str = "text/plain; charset=utf-8", response_code: str = '200 OK'):
+        response = b'HTTP/1.1 ' + response_code.encode()
+        response += b'\r\nContent-Length: ' + str(len(body)).encode()
+        response += b'\r\nContent-Type: ' + content_type.encode()
+        response += b'\r\n\r\n'
+        response += body
+        return response
+
 
 
 if __name__ == "__main__":
