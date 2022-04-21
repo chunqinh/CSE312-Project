@@ -72,7 +72,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 bio = info[1]
                 color = info[0]
 
-                content = TCPHandler.render_template("cse312-html/profile.html", {"bio": bio, "username color": color,
+                content = TCPHandler.render_template("cse312-html/profile.html", {"bio": escape_html(bio), "username color": color,
                                                                                   "username": TCPHandler.username})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
@@ -383,6 +383,11 @@ def getWebsocketKey(content):
     while content[end] != '\r':
         end += 1
     return content[beginning:end].encode()
+
+def escape_html(input):
+        return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+
+
 
 
 if __name__ == "__main__":
