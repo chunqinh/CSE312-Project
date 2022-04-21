@@ -2,10 +2,7 @@
 
 <html lang="en">
   <head>
-    <title>sign up - cse312</title>
-    <meta property="og:title" content="sign up - cse312" />
-    <meta property="og:title" content="Homepage after voting - cse312" />
-    <meta property="og:title" content="chat page - cse312" />
+    <title>profile - cse312</title>
     <meta property="og:title" content="profile - cse312" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,37 +45,36 @@
   </head>
   <body>
     <div>
-      <link href="./signup.css" rel="stylesheet" />
+      <link href="./profile_edit.css" rel="stylesheet" />
 
-      <div class="signup-container">
-
-        <form action="/signup" class="signup-form" method="post" enctype="multipart/form-data">
-
-          <h2 class="signup-heading">
-            <span class="signup-text">Create an Account</span>
-          </h2>
-          <div>
-            <label class="username_label">Username: <input class="username_input input" type="text" name="username" placeholder="Username" required/></label>
-          </div>
-          <div>
-            <label class="password_label">Password: <input class="password_input input" type="password" name="password" placeholder="Password" required/></label>
-          </div>
-          <div>
-            <label class="comfirm_pass_label">Confirm Password: <input class="comfirm_pass_input input" type="password" name="password2" placeholder="Confirm Password" required/></label>
-          </div>
+      <div class="profile-container">
+        <form class="profile-form" method="post" enctype="multipart/form-data">
+          <h2 class="profile-heading">Profile</h2>
           
-          <button class="signup-login-button button" type="submit" value="Join Now">
-            <span class="signup-text4">Join Now</span>
+          <span class="profile-text">Username: </span>
+          <span class="username_input" >{{username}}</span>
+          <!-- <span class="profile-text01"><span>Password:</span></span> -->
+          <label class="profile-text01">Bio:
+            <input class="bio_input input" type="text" name="bio" />
+          </label>
+          
+          <label class="profile-text03">Username Color:
+            <input class="user_color_input " type="color" name="color" value="{{username color}}">
+          </label>
+        
+          <!-- <span class="profile-text07">Text</span> -->
+         
+          <button class="profile-login-button button" type="submit">
+            <span class="profile-text04">Submit</span>
           </button>
 
-          <!-- <input  class="signup-text4" type="submit" value="Join Now"> -->
-
         </form>
-        <div class="signup-container1">
+        <div class="profile-container1">
+          <span class="profile-text10" style="color:{{username color}}">{{username}}</span>
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
-            class="signup-image"
+            class="profile-image"
           />
         </div>
       </div>
