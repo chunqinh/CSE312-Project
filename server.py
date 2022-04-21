@@ -91,6 +91,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
                 self.request.sendall(response)
+                
+            elif splitData[1] == "/createvote":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                info = cursor.fetchone()
+                color = info[0]
+                content = TCPHandler.render_template("cse312-html/createvote.html",
+                                                     {"username": TCPHandler.username, "username color": color})
+                response = TCPHandler.generate_response(content.encode(),
+                                                        "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
+                                                        "200 OK")
+                self.request.sendall(response)
 
                 # file_size_html = os.path.getsize('cse312-html/profile_edit.html')
                 # file_html = open("cse312-html/profile_edit.html", "r")

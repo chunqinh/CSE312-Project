@@ -31,6 +31,8 @@
   flex-direction: row;
   background-color: #dadada;
 }
+
+
 .createvote-text {
   left: 34px;
   bottom: 3px;
@@ -154,6 +156,21 @@
 }
 .createvote-login-button {
   left: 0px;
+  right: 0px;
+  width: 104px;
+  bottom: 31px;
+  height: 30px;
+  margin: auto;
+  display: flex;
+  position: absolute;
+  box-shadow: 5px 5px 10px 0px #a69f9f;
+  text-align: center;
+  padding-left: 1px;
+  padding-right: 5px;
+  flex-direction: row;
+}
+.createvote-cancel-button {
+  left: 20px;
   right: 0px;
   width: 104px;
   bottom: 31px;
