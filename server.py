@@ -72,8 +72,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 bio = info[1]
                 color = info[0]
 
-                content = TCPHandler.render_template("cse312-html/profile.html", {"bio": escape_html(bio), "username color": color,
-                                                                                  "username": TCPHandler.username})
+                content = TCPHandler.render_template("cse312-html/profile.html",
+                                                     {"bio": escape_html(bio), "username color": color,
+                                                      "username": TCPHandler.username})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
@@ -91,7 +92,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
                 self.request.sendall(response)
-                
+
             elif splitData[1] == "/createvote":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
@@ -328,6 +329,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(
                     "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
 
+            elif splitData[1] == "/createvote":
+                boundary = "--".encode() + getBoundary(recievedData.decode())
+                form_data = recievedData.split(boundary)
+                vote_name = getData(form_data[1].decode())
+                description = getData(form_data[2].decode())
+                option_1 = getData(form_data[3].decode())
+                option_2 = getData(form_data[4].decode())
+                print(vote_name)
+                print(description)
+                print(option_1)
+                print(option_2)
+
+
             sys.stdout.flush()
             sys.stderr.flush()
 
@@ -397,10 +411,30 @@ def getWebsocketKey(content):
         end += 1
     return content[beginning:end].encode()
 
+
+def getBoundary(content):
+    boundary = "boundary="
+    index = content.find(boundary)
+    beginning = index + len(boundary)
+    end = beginning
+    while content[end] != '\r':
+        end += 1
+    return content[beginning:end].encode()
+
+
+def getData(content):
+    doublecrlf = "\r\n\r\n"
+    index = content.find(doublecrlf)
+    beginning = index + len(doublecrlf)
+    end = beginning
+    while content[end] != '\r':
+        end += 1
+    return content[beginning:end]
+
+
+
 def escape_html(input):
-        return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
-
-
+    return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
 
 
 if __name__ == "__main__":
