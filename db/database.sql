@@ -13,28 +13,28 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 
 CREATE TABLE IF NOT EXISTS `voting` (
-    `vote_ID` INT NOT NULL,
+    `vote_ID` INT NOT NULL AUTO_INCREMENT,
     `creator_username` VARCHAR(99) NOT NULL,
     `vote_name` VARCHAR(99) NOT NULL,
     `vote_description` VARCHAR(99) NOT NULL,
     `photo` BLOB,
     `option_one_name` VARCHAR(99) NOT NULL,
-    `option_one_votes` INT NOT NULL,
+    `option_one_votes` INT DEFAULT 0,
     `option_two_name` VARCHAR(99) NOT NULL,
-    `option_two_votes` INT NOT NULL,
-    `option_three_name` VARCHAR(99),
-    `option_three_votes` INT,
-    `option_four_name` VARCHAR(99),
-    ` option_four_votes` INT,
-    `option_five_name` VARCHAR(99),
-    `option_five_votes` INT,
+    `option_two_votes` INT DEFAULT 0,
+    `option_three_name` VARCHAR(99) DEFAULT NULL,
+    `option_three_votes` INT DEFAULT 0,
+    `option_four_name` VARCHAR(99) DEFAULT NULL,
+    ` option_four_votes` INT DEFAULT 0,
+    `option_five_name` VARCHAR(99) DEFAULT NULL,
+    `option_five_votes` INT DEFAULT 0,
     PRIMARY KEY (`vote_ID`),
     FOREIGN KEY (`creator_username`) REFERENCES `user`(`username`)
 );
 
 
 CREATE TABLE IF NOT EXISTS `message` (
-    `message_ID` INT NOT NULL,
+    `message_ID` INT NOT NULL AUTO_INCREMENT,
     `sender_username` VARCHAR(99) NOT NULL,
     `receiver_username` VARCHAR(99) NOT NULL,
     `content` VARCHAR(999) NOT NULL,

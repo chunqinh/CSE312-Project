@@ -9,6 +9,7 @@ import mysql.connector
 
 class TCPHandler(socketserver.BaseRequestHandler):
     username = ''
+    voting_alive =False
 
     config = {
         'user': 'root',
@@ -51,17 +52,43 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # empty homepage
             elif splitData[1] == "/homepage":
-                connection = mysql.connector.connect(**TCPHandler.config)
-                cursor = connection.cursor()
-                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
-                info = cursor.fetchone()
-                color = info[0]
-                content = TCPHandler.render_template("cse312-html/homepage-empty.html",
-                                                     {"username": TCPHandler.username, "username color": color})
-                response = TCPHandler.generate_response(content.encode(),
-                                                        "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
-                                                        "200 OK")
-                self.request.sendall(response)
+
+                print(TCPHandler.voting_alive)
+
+                if TCPHandler.voting_alive:
+                    print("alive---------------")
+                    connection = mysql.connector.connect(**TCPHandler.config)
+                    cursor = connection.cursor()
+                    cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                    info = cursor.fetchone()
+                    color = info[0]
+                    content = TCPHandler.render_template("cse312-html/homepage-empty.html",
+                                                            {"username": TCPHandler.username, "username color": color})
+                    response = TCPHandler.generate_response(content.encode(),
+                                                            "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
+                                                            "200 OK")
+                    self.request.sendall(response)
+                else:
+                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+
+            
+            elif splitData[1] == "/homepage_voting":
+
+                if TCPHandler.voting_alive:
+                    connection = mysql.connector.connect(**TCPHandler.config)
+                    cursor = connection.cursor()
+                    cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                    info = cursor.fetchone()
+                    color = info[0]
+                    content = TCPHandler.render_template("cse312-html/homepagewvoting-creator.html",
+                                                            {"username": TCPHandler.username, "username color": color})
+                    response = TCPHandler.generate_response(content.encode(),
+                                                            "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
+                                                            "200 OK")
+                    self.request.sendall(response)
+                else:
+                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                    
 
             # profile page
             elif splitData[1] == "/profile":
@@ -339,6 +366,32 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 option_3 = getData(form_data[5].decode())
                 option_4 = getData(form_data[6].decode())
                 option_5 = getData(form_data[7].decode())
+
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+
+                if not option_3:
+                    option_3=NULL
+                if not option_4:
+                    option_4=NULL
+                if not option_5:
+                    option_5=NULL
+
+                cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name, option_four_name, option_five_name) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                    (TCPHandler.username,vote_name, description, "",option_1, option_2, option_3, option_4, option_5 ))
+                connection.commit()
+
+                # cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name) VALUES(%s, %s, %s, %s, %s, %s, %s)",
+                #                     (TCPHandler.username,vote_name, description, "",option_1, option_2, option_3 ))
+                # connection.commit()
+
+
+                cursor.execute("SELECT * FROM voting")
+                voting = cursor.fetchall()
+                print(voting)
+
+                connection.commit()
+                cursor.close()
 
 
             sys.stdout.flush()
