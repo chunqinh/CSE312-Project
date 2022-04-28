@@ -336,10 +336,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 description = getData(form_data[2].decode())
                 option_1 = getData(form_data[3].decode())
                 option_2 = getData(form_data[4].decode())
-                print(vote_name)
-                print(description)
-                print(option_1)
-                print(option_2)
+                option_3 = getData(form_data[5].decode())
+                option_4 = getData(form_data[6].decode())
+                option_5 = getData(form_data[7].decode())
 
 
             sys.stdout.flush()
@@ -430,7 +429,6 @@ def getData(content):
     while content[end] != '\r':
         end += 1
     return content[beginning:end]
-
 
 
 def escape_html(input):
