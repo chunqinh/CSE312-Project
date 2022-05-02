@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `voting` (
     `creator_username` VARCHAR(99) NOT NULL,
     `vote_name` VARCHAR(99) NOT NULL,
     `vote_description` VARCHAR(99) NOT NULL,
-    `photo` BLOB,
+    `photo` VARCHAR(99),
     `option_one_name` VARCHAR(99) NOT NULL,
     `option_one_votes` INT DEFAULT 0,
     `option_two_name` VARCHAR(99) NOT NULL,

@@ -10,6 +10,7 @@ import mysql.connector
 class TCPHandler(socketserver.BaseRequestHandler):
     username = ''
     voting_alive =False
+    # option_data =[]
 
     config = {
         'user': 'root',
@@ -56,20 +57,21 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print(TCPHandler.voting_alive)
 
                 if TCPHandler.voting_alive:
-                    print("alive---------------")
+                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+                    
+                else:
                     connection = mysql.connector.connect(**TCPHandler.config)
                     cursor = connection.cursor()
                     cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
                     info = cursor.fetchone()
                     color = info[0]
+                    print(color)
                     content = TCPHandler.render_template("cse312-html/homepage-empty.html",
                                                             {"username": TCPHandler.username, "username color": color})
                     response = TCPHandler.generate_response(content.encode(),
                                                             "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                             "200 OK")
                     self.request.sendall(response)
-                else:
-                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
 
             
             elif splitData[1] == "/homepage_voting":
@@ -80,8 +82,53 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
                     info = cursor.fetchone()
                     color = info[0]
-                    content = TCPHandler.render_template("cse312-html/homepagewvoting-creator.html",
-                                                            {"username": TCPHandler.username, "username color": color})
+
+                    cursor.execute('SELECT * FROM voting ORDER BY vote_ID DESC LIMIT 1')
+                    voting_info = cursor.fetchone()
+                    print(voting_info)
+                    creator = voting_info[1]
+
+                    participants =str(voting_info[6]+voting_info[8]+voting_info[10]+voting_info[12]+voting_info[14])
+                    Voting_Name=voting_info[2]
+                    Description=voting_info[3]
+                    upload_file=voting_info[4]
+                    # option_data=[]
+                    
+                    # option_data.append({'option_name':voting_info[5],"option_votes":str(voting_info[6])})
+                    # option_data.append({'option_name':voting_info[7],"option_votes":str(voting_info[8])})
+                    if voting_info[9] == "":
+                        option3_display="Display:none"
+                    else:
+                        option3_display="Display:inline"
+
+                    if voting_info[11] == "":
+                        option4_display="Display:none"
+                    else:
+                        option4_display="Display:inline"
+
+                    if voting_info[13] == "":
+                        option5_display="Display:none"
+                    else:
+                        option5_display="Display:inline"
+
+                    if creator == TCPHandler.username:
+                        end_vote_display ="Display:inline"
+                    else:
+                        end_vote_display = "Display:none"
+                    
+                    template_dict ={
+                        "option_votes_1": str(voting_info[6]),"option_name_1":voting_info[5], 
+                        "option_votes_2": str(voting_info[8]),"option_name_2":voting_info[7], 
+                        "option_votes_3": str(voting_info[10]),"option_name_3":voting_info[9],  "option3_display":option3_display, 
+                        "option_votes_4": str(voting_info[12]),"option_name_4":voting_info[11], "option4_display":option4_display,
+                        "option_votes_5": str(voting_info[14]),"option_name_5":voting_info[13], "option5_display":option5_display,
+                        "username": TCPHandler.username, "Description":Description, "end_vote_display":end_vote_display, 
+                        "username color": color, "upload_file":upload_file,"Voting_Name":Voting_Name,"participants":participants
+                    }
+
+
+                    content = TCPHandler.render_template("cse312-html/homepagewvoting-creator.html", template_dict)
+
                     response = TCPHandler.generate_response(content.encode(),
                                                             "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                             "200 OK")
@@ -365,17 +412,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 option_2 = getData(form_data[4].decode())
                 option_3 = getData(form_data[5].decode())
                 option_4 = getData(form_data[6].decode())
+                print(option_4)
                 option_5 = getData(form_data[7].decode())
+                print(option_5)
 
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
 
-                if not option_3:
-                    option_3=NULL
-                if not option_4:
-                    option_4=NULL
-                if not option_5:
-                    option_5=NULL
 
                 cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name, option_four_name, option_five_name) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                                     (TCPHandler.username,vote_name, description, "",option_1, option_2, option_3, option_4, option_5 ))
@@ -392,6 +435,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
                 connection.commit()
                 cursor.close()
+
+                TCPHandler.voting_alive=True
+                self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+
 
 
             sys.stdout.flush()
@@ -413,7 +460,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
         template = read_html
         template = TCPHandler.replace_placeholders(template, data)
-        # template = TCPHandler.render_loop(template, data)
+        if "loop_data" in data:
+            print("----------loop")
+            template = TCPHandler.render_loop(template, data)
 
         return template
 
