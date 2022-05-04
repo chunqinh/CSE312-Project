@@ -6,6 +6,7 @@ import hashlib
 import base64
 import mysql.connector
 from request import split_request, parse_headers
+import bcrypt
 
 
 class TCPHandler(socketserver.BaseRequestHandler):
@@ -25,24 +26,24 @@ class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         recievedData = self.request.recv(2048)
         print(recievedData)
-        print("createvote--------------------------------",recievedData) 
-        print("length------------------",len(recievedData))      
+        # print("createvote--------------------------------",recievedData) 
+        # print("length------------------",len(recievedData))      
         [request_line, headers_as_bytes, body] = split_request(recievedData)
         headers = parse_headers(headers_as_bytes)
         body_length = len(body)
         if 'Content-Length' in headers.keys():
             Content_Length = int(headers['Content-Length'])
-            print("Content_Length------------------",Content_Length)
+            # print("Content_Length------------------",Content_Length)
         
             while body_length < Content_Length:
                 received_data_loop = self.request.recv(2048)
-                print("hhh_length------------------",len(received_data_loop))    
+                # print("hhh_length------------------",len(received_data_loop))    
                 body += received_data_loop
                 recievedData += received_data_loop
                 body_length += len(received_data_loop)
-                print("body_length------------------",body_length)        
+                # print("body_length------------------",body_length)        
                     
-            print("createvote--------------------------------",recievedData)   
+            # print("createvote--------------------------------",recievedData)   
         splitData = recievedData.split(b" ")
 
         # signup page
@@ -315,7 +316,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print(insert_username)
                 print(insert_password)
                 print(password2)
-
+                # salt = bcrypt.gensalt()
+                # print(salt)
+                # hash_password = bcrypt.hashpw(insert_password.encode(), salt)
+                # print(hash_password)
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
                 cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s',
