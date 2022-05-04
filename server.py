@@ -5,6 +5,7 @@ import os
 import hashlib
 import base64
 import mysql.connector
+from request import split_request, parse_headers
 
 
 class TCPHandler(socketserver.BaseRequestHandler):
@@ -22,13 +23,31 @@ class TCPHandler(socketserver.BaseRequestHandler):
     websocket_connections = []
 
     def handle(self):
-        recievedData = self.request.recv(2048).strip()
+        recievedData = self.request.recv(2048)
         print(recievedData)
-        splitData = recievedData.decode().split(' ')
+        print("createvote--------------------------------",recievedData) 
+        print("length------------------",len(recievedData))      
+        [request_line, headers_as_bytes, body] = split_request(recievedData)
+        headers = parse_headers(headers_as_bytes)
+        body_length = len(body)
+        if 'Content-Length' in headers.keys():
+            Content_Length = int(headers['Content-Length'])
+            print("Content_Length------------------",Content_Length)
+        
+            while body_length < Content_Length:
+                received_data_loop = self.request.recv(2048)
+                print("hhh_length------------------",len(received_data_loop))    
+                body += received_data_loop
+                recievedData += received_data_loop
+                body_length += len(received_data_loop)
+                print("body_length------------------",body_length)        
+                    
+            print("createvote--------------------------------",recievedData)   
+        splitData = recievedData.split(b" ")
 
         # signup page
-        if splitData[0] == "GET":
-            if splitData[1] == "/signup":
+        if splitData[0] == b"GET":
+            if splitData[1] == b"/signup":
                 # print("---------------------------------------------",splitData[1])
                 # if ".css" in splitData[1]:
                 #     print("---------------------------------------------",splitData[1])
@@ -41,9 +60,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(frontend.encode())
 
             # load css 
-            elif ".css" in splitData[1]:
+            elif b".css" in splitData[1]:
 
-                css_path = 'cse312-html' + splitData[1]
+                css_path = 'cse312-html' + splitData[1].decode()
                 # file_size_css = os.path.getsize(css_path)
                 file_css = open(css_path, "r")
                 read_css = file_css.read()
@@ -51,8 +70,21 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     len(read_css.encode())) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_css
                 self.request.sendall(style.encode())
 
+            #load image
+            elif b"/public/playground_assets/" in splitData[1]:
+                print(splitData[1])
+                img_path = "cse312-html/"+splitData[1].decode()
+                print("---------------------",img_path)
+                img_header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg \r\nX-Content-Type-Options: nosniff \r\nContent-Length: "
+                with open(img_path,'rb') as img_file:
+                    img_content =  img_file.read()
+                    b = bytearray(img_content)
+                img_size = len(b)
+                img_response = img_header + str(img_size) + "\r\n\r\n" 
+                self.request.sendall(img_response.encode()+ img_content)
+
             # empty homepage
-            elif splitData[1] == "/homepage":
+            elif splitData[1] == b"/homepage":
 
                 print(TCPHandler.voting_alive)
 
@@ -74,7 +106,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall(response)
 
             
-            elif splitData[1] == "/homepage_voting":
+            elif splitData[1] == b"/homepage_voting":
 
                 if TCPHandler.voting_alive:
                     connection = mysql.connector.connect(**TCPHandler.config)
@@ -138,7 +170,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     
 
             # profile page
-            elif splitData[1] == "/profile":
+            elif splitData[1] == b"/profile":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
                 cursor.execute('SELECT username_color, bio FROM user WHERE username = %s', (TCPHandler.username,))
@@ -154,7 +186,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                                         "200 OK")
                 self.request.sendall(response)
 
-            elif splitData[1] == "/profile_edit":
+            elif splitData[1] == b"/profile_edit":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
                 cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
@@ -167,7 +199,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                                         "200 OK")
                 self.request.sendall(response)
 
-            elif splitData[1] == "/createvote":
+            elif splitData[1] == b"/createvote":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
                 cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
@@ -186,7 +218,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 # frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
                 # self.request.sendall(frontend.encode())
 
-            elif splitData[1] == "/websocket":
+            elif splitData[1] == b"/websocket":
                 key = getWebsocketKey(recievedData.decode())
                 key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".encode()
                 key = hashlib.sha1(key).hexdigest()
@@ -227,7 +259,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 
             # login page
-            elif splitData[1] == "/":
+            elif splitData[1] == b"/":
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
@@ -239,9 +271,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 
         # signup
-        elif splitData[0] == "POST":
-            if splitData[1] == "/signup":
-
+        elif splitData[0] == b"POST":
+            if splitData[1] == b"/signup":
                 print(recievedData)
                 header = recievedData.find(b'\r\n\r\n')
                 head = recievedData[0:header]
@@ -278,7 +309,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         start_index_password2 = x.find(start_password2)
                         need_password2 = x[start_index_password2 + len(start_password2):]
                         size_password2 = len(need_password2)
-                        last_boundary = b'\r\n' + boundary + b'--'  # \r\n-- + boundary + --
+                        last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         password2 = need_password2[:size_password2 - len(last_boundary)].decode()
 
                 print(insert_username)
@@ -291,6 +322,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                (insert_username, insert_password))
                 account = cursor.fetchone()
                 if insert_password != password2:
+                    print("你好")
                     self.request.sendall(
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
                 elif account:
@@ -311,7 +343,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: / \r\n\r\n".encode())
 
             # login
-            elif splitData[1] == "/login":
+            elif splitData[1] == b"/login":
                 print(recievedData)
                 header = recievedData.find(b'\r\n\r\n')
                 head = recievedData[0:header]
@@ -339,7 +371,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         start_index_password = x.find(start_password)
                         need_password = x[start_index_password + len(start_password):]
                         size_password = len(need_password)
-                        last_boundary = b'\r\n' + boundary + b'--'  # \r\n-- + boundary + --
+                        last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         insert_password = need_password[:size_password - len(last_boundary)].decode()
 
                 print(insert_username)
@@ -359,7 +391,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
 
             # profile edit post 
-            elif splitData[1] == "/profile_edit":
+            elif splitData[1] == b"/profile_edit":
                 print(recievedData)
 
                 header = recievedData.find(b'\r\n\r\n')
@@ -403,30 +435,34 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(
                     "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
 
-            elif splitData[1] == "/createvote":
-                boundary = "--".encode() + getBoundary(recievedData.decode())
+            elif splitData[1] == b"/createvote":      
+              
+                boundary = find_boundary(recievedData)
                 form_data = recievedData.split(boundary)
-                vote_name = getData(form_data[1].decode())
-                description = getData(form_data[2].decode())
-                option_1 = getData(form_data[3].decode())
-                option_2 = getData(form_data[4].decode())
-                option_3 = getData(form_data[5].decode())
-                option_4 = getData(form_data[6].decode())
-                print(option_4)
-                option_5 = getData(form_data[7].decode())
-                print(option_5)
+                image = find_image(form_data[1])
+                if image != b"":
+                    file_name = store_image(image)
+                else:
+                    file_name = 'vote-200h.png'
+                print(file_name)
+
+                vote_name = getData(form_data[2].decode())
+                description = getData(form_data[3].decode())
+                option_1 = getData(form_data[4].decode())
+                option_2 = getData(form_data[5].decode())
+                option_3 = getData(form_data[6].decode())
+                option_4 = getData(form_data[7].decode())
+                print("option_4----------------------------------------",option_4)
+                option_5 = getData(form_data[8].decode())
+                print("option_5----------------------------------------",option_5)
 
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
 
 
                 cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name, option_four_name, option_five_name) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                                    (TCPHandler.username,vote_name, description, "",option_1, option_2, option_3, option_4, option_5 ))
+                                    (TCPHandler.username,vote_name, description, file_name ,option_1, option_2, option_3, option_4, option_5 ))
                 connection.commit()
-
-                # cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name) VALUES(%s, %s, %s, %s, %s, %s, %s)",
-                #                     (TCPHandler.username,vote_name, description, "",option_1, option_2, option_3 ))
-                # connection.commit()
 
 
                 cursor.execute("SELECT * FROM voting")
@@ -522,6 +558,17 @@ def getBoundary(content):
         end += 1
     return content[beginning:end].encode()
 
+def find_boundary(request):
+    [request_line, headers_as_bytes, body] = split_request(request)
+    header = parse_headers(headers_as_bytes)
+    
+    print(header['Content-Type'])
+    Content_Type = header['Content-Type']
+    boundary_len = len('boundary=')
+    boundary = Content_Type[Content_Type.find('boundary=')+boundary_len:]
+    boundary = "--"+ boundary
+    return boundary.encode()
+
 
 def getData(content):
     doublecrlf = "\r\n\r\n"
@@ -532,9 +579,32 @@ def getData(content):
         end += 1
     return content[beginning:end]
 
+def parse_body(body, boundary):
+    request_split = body.split(boundary)
+    request_split = request_split[1:len(request_split)]
+    return(request_split)
+
+new_line = b'\r\n'
+blank_line_boundary = b'\r\n\r\n' 
+
+def find_image(parsed_body):
+    image = parsed_body[parsed_body.find(blank_line_boundary)+len(blank_line_boundary):len(parsed_body)-len(new_line)]
+    return image
+
+def store_image(image):
+    list = os.listdir('cse312-html/public/playground_assets') # dir is your directory path
+    number_files = len(list)+1
+    print(number_files)
+    file_name = "image" + str(number_files)+".jpg"
+    save_path = 'cse312-html/public/playground_assets'
+    completeName = os.path.join(save_path, file_name)
+    with open(completeName , "wb") as output_file:
+        output_file.write(image)
+    return file_name
 
 def escape_html(input):
     return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+
 
 
 if __name__ == "__main__":

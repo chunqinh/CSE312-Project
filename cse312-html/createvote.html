@@ -54,22 +54,23 @@
 
       <div class="createvote-container">
         <form class="createvote-form" method="post" enctype="multipart/form-data">
-          <button class="createvote-create-button button">
-            <span class="createvote-text">
-              <span class="createvote-text01">Upload Your</span>
-              <br />
-              <span class="createvote-text03">Picture Here!</span>
-            </span>
-          </button>
           <h2 class="createvote-heading">
             <span class="createvote-text04">Create an New Voting</span>
           </h2>
+          <input class="createvote-create-button" type="file" name="upload">
+            <!-- <span class="createvote-text">
+              <span class="createvote-text01">Upload Your</span>
+              <br />
+              <span class="createvote-text03">Picture Here!</span>
+            </span> -->
+          </input>
           <label class="createvote-text05">Voting name
             <input
             type="text"
             placeholder="Voting name"
             class="voting_name_input input"
             name="voting name"
+            required
           />
           </label>
 
@@ -78,6 +79,7 @@
               placeholder="Description"
               class="voting_description textarea"
               name = "description"
+              required
             ></textarea>
           </label>
 
@@ -87,12 +89,14 @@
             placeholder="Option 1"
             class="option1_input input"
             name="option 1"
+            required
           />
           <input
             type="text"
             placeholder="Option 2"
             class="option2_input input"
             name = "option 2"
+            required
           />
           <input
             type="text"
