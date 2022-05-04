@@ -316,34 +316,26 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print(insert_username)
                 print(insert_password)
                 print(password2)
-                # salt = bcrypt.gensalt()
-                # print(salt)
-                # hash_password = bcrypt.hashpw(insert_password.encode(), salt)
-                # print(hash_password)
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s',
-                               (insert_username, insert_password))
+                salt = bcrypt.gensalt()
+                hash_password = bcrypt.hashpw(insert_password.encode(), salt)
+                cursor.execute('SELECT * FROM user WHERE username = %s',
+                               (insert_username,))
                 account = cursor.fetchone()
                 if insert_password != password2:
                     print("你好")
                     self.request.sendall(
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
                 elif account:
-                    taken = "Username or Password already exists"
+                    taken = "Username already exists"
                     self.request.sendall(("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(
                         len(taken)) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + taken).encode())
                 else:
                     cursor.execute("INSERT INTO user(username, password) VALUES(%s,%s)",
-                                   (insert_username, insert_password))
+                                   (insert_username, hash_password))
                     connection.commit()
                     cursor.close()
-
-                    # file_size_html = os.path.getsize('cse312-html/profile.html')
-                    # file_html = open("cse312-html/profile.html", "r")
-                    # read_html = file_html.read()
-                    # frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
-                    # self.request.sendall(frontend.encode())
                     self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: / \r\n\r\n".encode())
 
             # login
@@ -382,17 +374,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print(insert_password)
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT * FROM user WHERE username = %s AND password = %s',
-                               (insert_username, insert_password))
+                cursor.execute('SELECT password FROM user WHERE username = %s',
+                               (insert_username,))
                 account = cursor.fetchone()
-                if not account:
+                print(account[0])
+                if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
+                    print("mtach")
+                    TCPHandler.username = insert_username
+                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                else:
+                    print("not match")
                     invaild = "Wrong Password or Account doesn't exist"
                     self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(
                         len(invaild)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + invaild).encode())
-                else:
-                    TCPHandler.username = insert_username
-                    self.request.sendall(
-                        "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                    
 
             # profile edit post 
             elif splitData[1] == b"/profile_edit":
