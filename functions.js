@@ -1,5 +1,5 @@
 // Establish a WebSocket connection with the server
-const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+const socket = new WebSocket('ws://' + window.location.host + '/homepage_voting/websocket');
 
 function sendVote(vote) {
     socket.send(JSON.stringify({'vote': vote}));
