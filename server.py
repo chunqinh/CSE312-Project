@@ -1,3 +1,4 @@
+from cgitb import handler
 import socketserver
 import sys
 import json
@@ -71,10 +72,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     len(read_css.encode())) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_css
                 self.request.sendall(style.encode())
 
+            # load js
+            elif b"functions.js" in splitData[1]:
+                # file_size_css = os.path.getsize(css_path)
+                file_js = open("functions.js", "r")
+                read_js = file_js.read()
+                style = "HTTP/1.1 200 OK\r\nContent-Length: " + str(
+                    len(read_js.encode())) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_js
+                self.request.sendall(style.encode())
+
             #load image
             elif b"/public/playground_assets/" in splitData[1]:
                 print(splitData[1])
-                img_path = "cse312-html/"+splitData[1].decode()
+                img_path = "cse312-html"+splitData[1].decode()
                 print("---------------------",img_path)
                 img_header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg \r\nX-Content-Type-Options: nosniff \r\nContent-Length: "
                 with open(img_path,'rb') as img_file:
@@ -97,7 +107,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     cursor = connection.cursor()
                     cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
                     info = cursor.fetchone()
+                    print(TCPHandler.username)
+                    print(info[0])
                     color = info[0]
+                    print("----------------color")
                     print(color)
                     content = TCPHandler.render_template("cse312-html/homepage-empty.html",
                                                             {"username": TCPHandler.username, "username color": color})
@@ -258,6 +271,30 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     for connection in TCPHandler.websocket_connections:
                         connection.request.sendall(ws_frame)
 
+            elif splitData[1] == b"/online_users":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username, username_color FROM user WHERE is_online = True')
+                info = cursor.fetchall()
+                print(info)
+                lis = []
+                for x in info:
+                    dic = {}
+                    dic["sender"] =TCPHandler.username
+                    dic["receiver"] = x[0]
+                    dic["color"] = x[1]
+                    lis.append(dic)
+                print(lis)
+                response = TCPHandler.generate_response(json.dumps(lis).encode(),'application/json; charset=utf-8')
+                self.request.sendall(response)
+
+            elif b"/chat=" in splitData[1]:
+                file_html = open("cse312-html/chatpage.html", "r")
+                read_html = file_html.read()
+                frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(
+                    len(read_html.encode())) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
+                self.request.sendall(frontend.encode())
+
 
             # login page
             elif splitData[1] == b"/":
@@ -299,12 +336,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_username = x[start_index_username + len(start_username):]
                         size_username = len(need_username)
                         insert_username = need_username[:size_username - len(b'\r\n')].decode()
+                        insert_username = escape_html(insert_username)
 
                     elif start_password in x:
                         start_index_password = x.find(start_password)
                         need_password = x[start_index_password + len(start_password):]
                         size_password = len(need_password)
                         insert_password = need_password[:size_password - len(b'\r\n')].decode()
+                        insert_password = escape_html(insert_password)
 
                     elif start_password2 in x:
                         start_index_password2 = x.find(start_password2)
@@ -312,6 +351,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_password2 = len(need_password2)
                         last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         password2 = need_password2[:size_password2 - len(last_boundary)].decode()
+                        password2 = escape_html(password2)
+
 
                 print(insert_username)
                 print(insert_password)
@@ -327,6 +368,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print("你好")
                     self.request.sendall(
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
+                elif '&' or '/' in insert_username:
+                    self.request.sendall(
+                        "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
+            
                 elif account:
                     taken = "Username already exists"
                     self.request.sendall(("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(
@@ -362,6 +407,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_username = x[start_index_username + len(start_username):]
                         size_username = len(need_username)
                         insert_username = need_username[:size_username - len(b'\r\n')].decode()
+                        insert_username = escape_html(insert_username)
 
                     elif start_password in x:
                         start_index_password = x.find(start_password)
@@ -369,6 +415,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_password = len(need_password)
                         last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         insert_password = need_password[:size_password - len(last_boundary)].decode()
+                        insert_password= escape_html(insert_password)
 
                 print(insert_username)
                 print(insert_password)
@@ -377,17 +424,25 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 cursor.execute('SELECT password FROM user WHERE username = %s',
                                (insert_username,))
                 account = cursor.fetchone()
-                print(account[0])
-                if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
-                    print("mtach")
-                    TCPHandler.username = insert_username
-                    self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                if account:
+                    print(account[0])
+                    if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
+                        print("mtach")
+                        TCPHandler.username = insert_username
+                        cursor.execute('UPDATE user SET is_online = True WHERE username = %s',
+                        (insert_username,))
+                        connection.commit()
+                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                    else:
+                        print("not match")
+                        invaild = "Wrong Password or Account doesn't exist"
+                        self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(
+                            len(invaild)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + invaild).encode())
                 else:
-                    print("not match")
                     invaild = "Wrong Password or Account doesn't exist"
                     self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(
                         len(invaild)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + invaild).encode())
-                    
+                
 
             # profile edit post 
             elif splitData[1] == b"/profile_edit":
@@ -414,6 +469,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_bio = x[start_index_bio + len(start_bio):]
                         size_bio = len(need_bio)
                         new_bio = need_bio[:size_bio - len(b'\r\n')].decode()
+                        new_bio = escape_html(new_bio)
 
                     elif start_color in x:
                         start_index_color = x.find(start_color)
@@ -421,6 +477,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_color = len(need_color)
                         last_boundary = b'\r\n' + boundary + b'--'  # \r\n-- + boundary + --
                         new_color = need_color[:size_color - len(last_boundary)].decode()
+                        
 
                 print(new_bio)
                 print(new_color)
@@ -446,13 +503,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 print(file_name)
 
                 vote_name = getData(form_data[2].decode())
+                vote_name = escape_html(vote_name)
                 description = getData(form_data[3].decode())
+                description = escape_html(description)
                 option_1 = getData(form_data[4].decode())
+                option_1= escape_html(option_1)
                 option_2 = getData(form_data[5].decode())
+                option_2= escape_html(option_2)
                 option_3 = getData(form_data[6].decode())
+                option_3= escape_html(option_3)
                 option_4 = getData(form_data[7].decode())
+                option_4= escape_html(option_4)
                 print("option_4----------------------------------------",option_4)
                 option_5 = getData(form_data[8].decode())
+                option_5= escape_html(option_5)
                 print("option_5----------------------------------------",option_5)
 
                 connection = mysql.connector.connect(**TCPHandler.config)

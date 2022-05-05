@@ -5,7 +5,7 @@ use 312project_db;
 CREATE TABLE IF NOT EXISTS `user` (
     `username` VARCHAR(99) NOT NULL,
     `password` VARCHAR(99) NOT NULL,
-    `is_online` BOOLEAN,
+    `is_online` BOOLEAN DEFAULT FALSE,
     `username_color` VARCHAR(99) DEFAULT '#000000',
     `bio` VARCHAR(99) DEFAULT 'No Bio',
     PRIMARY KEY (`username`)

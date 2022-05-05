@@ -50,18 +50,15 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
+  <body onload="get_online_users()">
     <div>
       <link href="./homepage-empty.css" rel="stylesheet" />
 
       <div class="homepage-empty-container">
         <aside class="homepage-empty-container1">
-          <ul class="homepage-empty-ul list">
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
+          <ul class="homepage-empty-ul list" id="user">
           </ul>
-          <span class="homepage-empty-text3">Online number</span>
+          <span class="homepage-empty-text3">Online Users</span>
         </aside>
         <main class="homepage-empty-container2">
           <a href="/createvote" class="homepage-empty-button button">
@@ -90,6 +87,8 @@
         </div>
       </div>
     </div>
+
+  <script src="../functions.js"></script>
 
 
     <script>
