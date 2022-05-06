@@ -368,9 +368,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print("你好")
                     self.request.sendall(
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
-                elif '&' or '/' in insert_username:
-                    self.request.sendall(
-                        "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
+                # elif '&' or '/' in insert_username:
+                #     self.request.sendall(
+                #         "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
             
                 elif account:
                     taken = "Username already exists"
