@@ -55,3 +55,22 @@ function addUser(username) {
         user.innerHTML += "<a href='/chat="+username['sender']+ "&"+username['receiver']+ "' class='list-item' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </a>";
     }
 }
+
+function get_chat_history() {
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            const messages = JSON.parse(this.response);
+            for (const message of messages) {
+                addMessage(message);
+            }
+        }
+    };
+    request.open("GET", "/chat-history");
+    request.send();
+}
+
+function addMessage(chatMessage) {
+    let chat = document.getElementById('chat');
+    chat.innerHTML += "<b>" + chatMessage['username'] + "</b>: " + chatMessage["comment"] + "<br/>";
+}

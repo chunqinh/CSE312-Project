@@ -49,18 +49,14 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
+  <body onload="get_online_users()">
     <div>
       <link href="./homepagewvoting-creator.css" rel="stylesheet" />
 
       <div class="homepagewvoting-creator-container">
         <aside class="homepagewvoting-creator-container1">
-          <ul class="homepagewvoting-creator-ul list">
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
-          </ul>
-          <span class="homepagewvoting-creator-text03">Online number</span>
+          <ul class="homepage-empty-ul list" id="user"></ul>
+          <span class="homepagewvoting-creator-text03">Online Users</span>
         </aside>
         <!-- {{loop}}
         <b>{{comment}}</b>: <img src="image/{{upload_file}}" alt="It's {{upload_file}}" class="my_image"/><br/>
@@ -133,6 +129,7 @@
         x.style.display = 'none';
       }
     </script> -->
+    <script src="../functions.js"></script>
   </body>
 </html>
 

@@ -231,3 +231,12 @@
   position: absolute;
   object-fit: cover;
 }
+.homepage-empty-ul {
+  top: 10%;
+  left: 0px;
+  bottom: 0px;
+  height: 90%;
+  position: absolute;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
