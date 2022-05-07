@@ -300,7 +300,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
             # login page
             elif splitData[1] == b"/":
                 print(recievedData)
-                print(splitData)
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
@@ -310,7 +309,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             elif splitData[1] == b"/logout":
                 self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
-
 
 
 
