@@ -19,6 +19,46 @@
       html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6 {  margin: 0;  padding: 0;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}
     </style>
     <style>
+      /* body {font-family: Arial, Helvetica, sans-serif;} */
+
+      /* The Modal (background) */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      /* Modal Content */
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+
+      /* The Close Button */
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
       html {
         font-family: Inter;
         font-size: 16px;
@@ -52,11 +92,14 @@
   </head>
   <body onload="get_online_users()">
     <div>
+
       <link href="./homepage-empty.css" rel="stylesheet" />
 
       <div class="homepage-empty-container">
         <aside class="homepage-empty-container1">
           <ul class="homepage-empty-ul list" id="user"></ul>
+          <!-- <li class='list-item' onclick='popup(`hi`,`hello`,``)' > <span style ='color:black'> receiver</span> </li> -->
+    
           <span class="homepage-empty-text3">Online Users</span>
         </aside>
         <main class="homepage-empty-container2">
@@ -85,7 +128,44 @@
 
         </div>
       </div>
+      <!-- Trigger/Open The Modal -->
+      <!-- <button id="myBtn">Open Modal</button> -->
+
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div>From: <div id="sender"></div></div>
+          </br>
+          <div>To: <div id="receiver"></div></div>
+          </br>
+          <div id="received_message"></div>
+          </br>
+          <div id="show_send_message"></div>
+          </br>
+          </br>
+          <input id="send_message" type="text" class="input" name="send_message">
+          <button onclick="sendMessage()">Send</button>
+        </div>
+
+      </div>
+
+      <!-- <button class="open-button" onclick="openForm()">Open Form</button>
+      <div id="popup">
+          <div> From: <div id="sender"></div></div>
+          </br>
+          <div>To <div id="receiver"></div></div>
+          </br>
+          <div id="received_message"></div>
+          </br>
+          <input id="send_message" type="text" name="send_message">
+          <button onclick="sendMessage()">Send</button>
+      </div> -->
     </div>
+    
+
 
   <script src="../functions.js"></script>
 
@@ -96,6 +176,32 @@
       function myFunction() {
         document.getElementById("myDropdown").classList.toggle("show");
       }
+
+      // Get the modal
+      // var modal = document.getElementById("myModal");
+
+      // // Get the button that opens the modal
+      // var btn = document.getElementById("myBtn");
+
+      // // Get the <span> element that closes the modal
+      // var span = document.getElementsByClassName("close")[0];
+
+      // // When the user clicks the button, open the modal 
+      // btn.onclick = function() {
+      //   modal.style.display = "block";
+      // }
+
+      // // When the user clicks on <span> (x), close the modal
+      // span.onclick = function() {
+      //   modal.style.display = "none";
+      // }
+
+      // // When the user clicks anywhere outside of the modal, close it
+      // window.onclick = function(event) {
+      //   if (event.target == modal) {
+      //     modal.style.display = "none";
+      //   }
+      // }
       
       // Close the dropdown if the user clicks outside of it
       window.onclick = function(event) {
@@ -110,7 +216,7 @@
           }
         }
       }
-      </script>
+    </script>
 
   </body>
 </html>

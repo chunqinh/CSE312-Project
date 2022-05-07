@@ -1,5 +1,14 @@
 // Establish a WebSocket connection with the server
 const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+// Get the modal
+var modal = document.getElementById("myModal");
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// var send_message =''
+// var received_message=''
+// var sender =''
+// var receiver =''
 
 function sendVote(vote) {
     socket.send(JSON.stringify({'vote': vote}));
@@ -46,13 +55,23 @@ function get_online_users() {
     request.send();
 }
 
+
+
 function addUser(username) {
     let user = document.getElementById('user');
+    // received_message=''
+    // send_message=''
+    // sender =username['sender']
+    // receiver = username['receiver']
     // user.style.color = username['color']
+    message=''
     if (username['sender']== username['receiver']){
-        user.innerHTML += "<li class='list-item' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
+        user.innerHTML += "<li class='list-item' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }else{
-        user.innerHTML += "<a href='/chat="+username['sender']+ "&"+username['receiver']+ "' class='list-item' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </a>";
+        // user.innerHTML += "<li class='list-item' onclick='popup()' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
+        // user.innerHTML += "<li class='list-item' onclick='popup(\''+ username['sender'] + '\')' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
+
+        user.innerHTML += "<li class='list-item' onclick='popup(`"+ username['sender'] +"`,`"+ username['receiver']+ "`,`"+message+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }
 }
 
@@ -73,4 +92,34 @@ function get_chat_history() {
 function addMessage(chatMessage) {
     let chat = document.getElementById('chat');
     chat.innerHTML += "<b>" + chatMessage['username'] + "</b>: " + chatMessage["comment"] + "<br/>";
+}
+
+
+
+function popup(sender, receiver, message){
+    let popup_sender = document.getElementById('sender')
+    popup_sender.innerHTML =sender
+    let popup_receiver = document.getElementById('receiver')
+    popup_receiver.innerHTML =receiver
+    let rece_message = document.getElementById('received_message')
+    rece_message.innerHTML = message
+    // sender, receiver, message
+    modal.style.display = "block";
+}
+
+// // When the user clicks the button, open the modal 
+// btn.onclick = function() {
+//     modal.style.display = "block";
+// }
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
 }
