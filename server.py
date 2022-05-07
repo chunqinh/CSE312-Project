@@ -309,7 +309,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(frontend.encode())
 
             elif splitData[1] == b"/logout":
+                header = {}
+                head = recievedData.decode()
+                split_header = head.split('\r\n')
+                for x in split_header:
+                    if ": " in x:
+                        key, value = x.split(": ")
+                        header[key] = value
+                # print(header)
+                # print(header["Cookie"])
                 self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
+
 
 
 
