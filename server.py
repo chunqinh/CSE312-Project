@@ -370,7 +370,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
                 # elif '&' or '/' in insert_username:
                 #     self.request.sendall(
-                #         "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
+                #         "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
             
                 elif account:
                     taken = "Username already exists"
@@ -666,7 +666,7 @@ def store_image(image):
     return file_name
 
 def escape_html(input):
-    return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace("'","&#39;").replace('"',"&quot;").replace("/","&#47;")
 
 
 

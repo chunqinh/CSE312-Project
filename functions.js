@@ -70,8 +70,7 @@ function addUser(username) {
     }else{
         // user.innerHTML += "<li class='list-item' onclick='popup()' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
         // user.innerHTML += "<li class='list-item' onclick='popup(\''+ username['sender'] + '\')' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
-
-        user.innerHTML += "<li class='list-item' onclick='popup(`"+ username['sender'] +"`,`"+ username['receiver']+ "`,`"+message+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
+        user.innerHTML += "<li class='list-item' onclick='popup(`"+ escapeHtml(username['sender']) +"`,`"+ escapeHtml(username['receiver'])+ "`,`"+escapeHtml(message)+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }
 }
 
@@ -123,3 +122,12 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
+
+function escapeHtml(unsafe){
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
