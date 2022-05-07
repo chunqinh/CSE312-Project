@@ -1,4 +1,5 @@
 from cgitb import handler
+import secrets
 import socketserver
 import sys
 import json
@@ -298,12 +299,27 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # login page
             elif splitData[1] == b"/":
+                print(recievedData)
+                print(splitData)
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
                 frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(
                     len(read_html.encode())) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
                 self.request.sendall(frontend.encode())
+
+            elif splitData[1] == b"/logout":
+                header = {}
+                head = recievedData.decode()
+                split_header = head.split('\r\n')
+                for x in split_header:
+                    if ": " in x:
+                        key, value = x.split(": ")
+                        header[key] = value
+                # print(header)
+                # print(header["Cookie"])
+                self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
+
 
 
 
@@ -375,7 +391,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 elif account:
                     taken = "Username already exists"
                     self.request.sendall(("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(
-                        len(taken)) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + taken).encode())
+                        len(taken)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\ncharset=utf-8\r\n\r\n" + taken).encode())
                 else:
                     cursor.execute("INSERT INTO user(username, password) VALUES(%s,%s)",
                                    (insert_username, hash_password))
@@ -425,14 +441,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                (insert_username,))
                 account = cursor.fetchone()
                 if account:
-                    print(account[0])
+                    # print(account[0])
                     if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
                         print("mtach")
+                        auth_token = secrets.token_urlsafe()
+                        salt = bcrypt.gensalt()
+                        hash_token = b'id=' + bcrypt.hashpw(auth_token.encode(), salt)
+                        print(hash_token)
                         TCPHandler.username = insert_username
-                        cursor.execute('UPDATE user SET is_online = True WHERE username = %s',
-                        (insert_username,))
+                        cursor.execute('UPDATE user SET token = %s, is_online = True WHERE username = %s',
+                        (hash_token.decode(), insert_username,))
                         connection.commit()
-                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                        self.request.sendall(("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: "+ hash_token.decode() +"; Max-Age=3600; HttpOnly\r\nLocation: /homepage \r\n\r\n").encode())
+
                     else:
                         print("not match")
                         invaild = "Wrong Password or Account doesn't exist"
