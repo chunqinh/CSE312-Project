@@ -112,7 +112,14 @@
           </div>
         </main>
         <div class="homepagewvoting-creator-container6">
-          <span class="homepagewvoting-creator-text13" style="color:{{username color}}">{{username}}</span>
+          <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn" style="color:{{username color}}" >{{username}}</button>
+            <div id="myDropdown" class="dropdown-content">
+              <a href="/profile">Profile</a>
+              <a href="#">Messages</a>
+              <a href="#">Log Out</a>
+            </div>
+          </div>
           <img
             alt="image"
             src="/public/playground_assets/vote-200h.png"
