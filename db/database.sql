@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS `message` (
     `sender_username` VARCHAR(99) NOT NULL,
     `receiver_username` VARCHAR(99) NOT NULL,
     `content` VARCHAR(999) NOT NULL,
-    `message_time` DATETIME NOT NULL,
+    `is_new` BOOLEAN DEFAULT FALSE,
+    -- `message_time` DATETIME NOT NULL,
     PRIMARY KEY (`message_ID`),
     FOREIGN KEY (`sender_username`) REFERENCES `user`(`username`),
     FOREIGN KEY (`receiver_username`) REFERENCES `user`(`username`)

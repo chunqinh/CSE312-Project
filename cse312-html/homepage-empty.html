@@ -75,6 +75,16 @@
         background-color: var(--dl-color-gray-white);
 
       }
+      .chathistory-container {
+        width: 100%;
+        display: flex;
+        overflow: auto;
+        height: auto;
+        /* min-height: 100vh; */
+        /* align-items: center; */
+        flex-direction: column;
+        justify-content: center;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -90,7 +100,7 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body onload="get_online_users()">
+  <body onload="welcome()">
     <div>
 
       <link href="./homepage-empty.css" rel="stylesheet" />
@@ -114,7 +124,6 @@
             <button onclick="myFunction()" class="dropbtn" style="color:{{username color}}" >{{username}}</button>
             <div id="myDropdown" class="dropdown-content">
               <a href="/profile">Profile</a>
-              <a href="#">Messages</a>
               <a href="#">Log Out</a>
             </div>
           </div>
@@ -138,13 +147,13 @@
         <div class="modal-content">
           <span class="close">&times;</span>
           <div>From: <div id="sender"></div></div>
-          </br>
           <div>To: <div id="receiver"></div></div>
           </br>
-          <div id="received_message"></div>
+          <div class="chathistory-container" id="chat_history">
+
+          </div>
           </br>
           <div id="show_send_message"></div>
-          </br>
           </br>
           <input id="send_message" type="text" class="input" name="send_message">
           <button onclick="sendMessage()">Send</button>

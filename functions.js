@@ -46,6 +46,8 @@ function get_online_users() {
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             const users = JSON.parse(this.response);
+            let user = document.getElementById('user');
+            user.innerHTML='';
             for (const user of users) {
                 addUser(user);
             }
@@ -59,57 +61,98 @@ function get_online_users() {
 
 function addUser(username) {
     let user = document.getElementById('user');
-    // received_message=''
-    // send_message=''
-    // sender =username['sender']
-    // receiver = username['receiver']
-    // user.style.color = username['color']
-    message=''
+    
+    // message=''
     if (username['sender']== username['receiver']){
         user.innerHTML += "<li class='list-item' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }else{
         // user.innerHTML += "<li class='list-item' onclick='popup()' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
         // user.innerHTML += "<li class='list-item' onclick='popup(\''+ username['sender'] + '\')' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
-        user.innerHTML += "<li class='list-item' onclick='popup(`"+ escapeHtml(username['sender']) +"`,`"+ escapeHtml(username['receiver'])+ "`,`"+escapeHtml(message)+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
+        user.innerHTML += "<li class='list-item' onclick='popup(`"+ escapeHtml(username['sender']) +"`,`"+ escapeHtml(username['receiver'])+ "`,`"+username['chat_history']+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }
 }
 
-function get_chat_history() {
+
+function addMessage(chatMessage) {
+    let chat = document.getElementById('chat_history');
+    console.log(chatMessage);
+    chat.innerHTML += "<b>" + chatMessage['sender'] + "</b>: " + chatMessage["message"] + "<br/>";
+}
+
+function sendMessage() {
+    const chatBox = document.getElementById("send_message");
+    const message = chatBox.value;
+    const sender = document.getElementById("sender").textContent;
+    const receiver = document.getElementById("receiver").textContent;
+    chatBox.value = "";
+    // const send_message = document.getElementById("show_send_message");
+    const send_message = document.getElementById('chat_history');
+    send_message.innerHTML += "<b>" + sender + "</b>: " + message + "<br/>";
+    // send_message.textContent += sender +": "+message;
+    chatBox.focus();
+    if (message !== "") {
+        // setInterval(request,1000)
+        const request = new XMLHttpRequest();
+        
+        request.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log(this.response)
+                // const messages = JSON.parse(this.response);
+                // for (const message of messages) {
+                //     addMessage(message);
+                // }
+            }
+        };
+        request.open("POST", "/direct-message");
+        let data = {'sender':sender,'receiver':receiver,'message':message};
+        request.send(JSON.stringify(data));
+        
+    }
+}
+
+function fetchMessage(){
+    
     const request = new XMLHttpRequest();
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             const messages = JSON.parse(this.response);
-            for (const message of messages) {
-                addMessage(message);
+            console.log(messages)
+            if (messages['chat_history'] !=''){
+                popup(messages['sender'],messages['receiver'],messages['chat_history']);
             }
+            // for (const message of messages) {
+            //     addMessage(message);
+            // }
         }
     };
-    request.open("GET", "/chat-history");
+    request.open("GET", "/get-message");
     request.send();
 }
 
-function addMessage(chatMessage) {
-    let chat = document.getElementById('chat');
-    chat.innerHTML += "<b>" + chatMessage['username'] + "</b>: " + chatMessage["comment"] + "<br/>";
-}
 
 
-
-function popup(sender, receiver, message){
-    let popup_sender = document.getElementById('sender')
-    popup_sender.innerHTML =sender
-    let popup_receiver = document.getElementById('receiver')
-    popup_receiver.innerHTML =receiver
-    let rece_message = document.getElementById('received_message')
-    rece_message.innerHTML = message
+function popup(sender, receiver, messages){
+    console.log(sender)
+    console.log(receiver)
+    console.log(messages)
+    let popup_sender = document.getElementById('sender');
+    popup_sender.innerHTML =sender;
+    let popup_receiver = document.getElementById('receiver');
+    popup_receiver.innerHTML =receiver;
+    let rece_message = document.getElementById('chat_history')
+    rece_message.textContent = '';
+    
+    const mess =JSON.parse(messages)
+    // console.log(mess)
+    for (const message of mess) {
+        addMessage(message);
+    }
+    
+    // rece_message.innerHTML = message
     // sender, receiver, message
     modal.style.display = "block";
 }
 
-// // When the user clicks the button, open the modal 
-// btn.onclick = function() {
-//     modal.style.display = "block";
-// }
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
@@ -150,3 +193,13 @@ function escapeHtml(unsafe){
       }
     }
   }
+
+function welcome() {
+
+    fetchMessage();
+    setInterval(fetchMessage,1000);
+    get_online_users();
+    setInterval(get_online_users,1000);
+
+
+}
