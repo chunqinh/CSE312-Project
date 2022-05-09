@@ -382,9 +382,18 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # login page
             elif splitData[1] == b"/":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT * FROM user WHERE token = %s', (cookie,))
+                info = cursor.fetchone()
+                if info:
+                    if TCPHandler.voting_alive:
+                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+                    else:
+                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
 
                 print(recievedData)
-
+                
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
