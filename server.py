@@ -351,6 +351,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # login page
             elif splitData[1] == b"/":
+
+                print(recievedData)
+
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
@@ -360,7 +363,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
 
                 
-
 
         # signup
         elif splitData[0] == b"POST":
