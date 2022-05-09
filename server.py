@@ -5,6 +5,7 @@ import json
 import os
 import hashlib
 import base64
+import secrets
 import mysql.connector
 from request import split_request, parse_headers
 import bcrypt
@@ -348,6 +349,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print("no new message --------------------")
                     response = TCPHandler.generate_response(json.dumps({'sender':'','receiver':'','chat_history':''}).encode(),'application/json; charset=utf-8')
                     self.request.sendall(response)
+            
+            # logout
+            elif splitData[1] == b"/logout":
+                 self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
 
             # login page
             elif splitData[1] == b"/":
@@ -484,11 +489,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print(account[0])
                     if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
                         print("mtach")
+                        auth_token = secrets.token_urlsafe()
+                        salt = bcrypt.gensalt()
+                        hash_token = b'id=' + bcrypt.hashpw(auth_token.encode(), salt)
+                        print(hash_token)
                         TCPHandler.username = insert_username
-                        cursor.execute('UPDATE user SET is_online = True WHERE username = %s',
-                        (insert_username,))
+                        cursor.execute('UPDATE user SET token = %s, is_online = True WHERE username = %s',
+                        (hash_token.decode(), insert_username,))
                         connection.commit()
-                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+                        self.request.sendall(("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: "+ hash_token.decode() +"; Max-Age=3600; HttpOnly\r\nLocation: /homepage \r\n\r\n").encode())
                     else:
                         print("not match")
                         invaild = "Wrong Password or Account doesn't exist"
