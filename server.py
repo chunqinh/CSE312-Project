@@ -1,5 +1,4 @@
 from cgitb import handler
-import secrets
 import socketserver
 import sys
 import json
@@ -284,6 +283,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     dic["sender"] =TCPHandler.username
                     dic["receiver"] = x[0]
                     dic["color"] = x[1]
+                    cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC ', (TCPHandler.username,x[0],TCPHandler.username,x[0]))
+                    messages = cursor.fetchall()
+                    print(messages)
+                    list_messages =[]
+                    for message in messages:
+                        message_dic ={}
+                        message_dic['sender'] =message[1]
+                        message_dic['receiver'] =message[2]
+                        message_dic['message'] =message[3]
+                        list_messages.append(message_dic)
+                    dic["chat_history"] = json.dumps(list_messages)
                     lis.append(dic)
                 print(lis)
                 response = TCPHandler.generate_response(json.dumps(lis).encode(),'application/json; charset=utf-8')
@@ -296,10 +306,54 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     len(read_html.encode())) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
                 self.request.sendall(frontend.encode())
 
+            elif splitData[1] == b"/get-message":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT * FROM message WHERE receiver_username =%s AND is_new=%s ORDER BY message_ID ASC LIMIT 1', (TCPHandler.username,True))
+                oldest_new_message = cursor.fetchall()
+                if oldest_new_message:
+                    print(oldest_new_message)
+                    sender_info = oldest_new_message[0][1]
+                    print(sender_info)
+                    print(type(sender_info))
+                    
+
+                    cursor.execute('UPDATE message SET is_new = False WHERE receiver_username =%s AND sender_username = %s',
+                            (TCPHandler.username,sender_info))
+                    connection.commit()
+                    cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC ', (TCPHandler.username,sender_info,TCPHandler.username,sender_info))
+                    messages = cursor.fetchall()
+
+                    # lis=[]
+                    dic = {}
+                    dic["sender"] =sender_info
+                    dic["receiver"] = TCPHandler.username
+                    # dic["color"] = x[1]
+                    # cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC LIMIT 1', (TCPHandler.username,x[0],TCPHandler.username,x[0]))
+                    # messages = cursor.fetchall()
+                    # print(messages)
+                    list_messages =[]
+                    for message in messages:
+                        message_dic ={}
+                        message_dic['sender'] =message[1]
+                        message_dic['receiver'] =message[2]
+                        message_dic['message'] =message[3]
+                        list_messages.append(message_dic)
+                    dic["chat_history"] = json.dumps(list_messages)
+                    print("__________________________new message")
+
+                    response = TCPHandler.generate_response(json.dumps(dic).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
+                else:
+                    print("no new message --------------------")
+                    response = TCPHandler.generate_response(json.dumps({'sender':'','receiver':'','chat_history':''}).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
 
             # login page
             elif splitData[1] == b"/":
+
                 print(recievedData)
+
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
@@ -307,10 +361,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     len(read_html.encode())) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
                 self.request.sendall(frontend.encode())
 
-            elif splitData[1] == b"/logout":
-                self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
 
-
+                
 
         # signup
         elif splitData[0] == b"POST":
@@ -379,7 +431,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 elif account:
                     taken = "Username already exists"
                     self.request.sendall(("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(
-                        len(taken)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\ncharset=utf-8\r\n\r\n" + taken).encode())
+                        len(taken)) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + taken).encode())
                 else:
                     cursor.execute("INSERT INTO user(username, password) VALUES(%s,%s)",
                                    (insert_username, hash_password))
@@ -429,19 +481,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                (insert_username,))
                 account = cursor.fetchone()
                 if account:
-                    # print(account[0])
+                    print(account[0])
                     if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
                         print("mtach")
-                        auth_token = secrets.token_urlsafe()
-                        salt = bcrypt.gensalt()
-                        hash_token = b'id=' + bcrypt.hashpw(auth_token.encode(), salt)
-                        print(hash_token)
                         TCPHandler.username = insert_username
-                        cursor.execute('UPDATE user SET token = %s, is_online = True WHERE username = %s',
-                        (hash_token.decode(), insert_username,))
+                        cursor.execute('UPDATE user SET is_online = True WHERE username = %s',
+                        (insert_username,))
                         connection.commit()
-                        self.request.sendall(("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: "+ hash_token.decode() +"; Max-Age=3600; HttpOnly\r\nLocation: /homepage \r\n\r\n").encode())
-
+                        self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
                     else:
                         print("not match")
                         invaild = "Wrong Password or Account doesn't exist"
@@ -499,6 +546,42 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 cursor.close()
                 self.request.sendall(
                     "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
+
+            elif splitData[1] == b"/direct-message":
+                # ("print ___________DM")
+                [request_line, headers_as_bytes, body] = split_request(recievedData)
+                json_string = json.loads(body)
+                print(json_string)
+                # if json_string['receiver'] == TCPHandler.username:
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                # cursor.execute('SELECT sender_username FROM message WHERE receiver_username = %s',
+                #            (TCPHandler.username,))
+                # message = cursor.fetchone()
+                # if message:
+                #     cursor.execute("UPDATE message SET sender_username = %s, content =%s WHERE receiver_username = %s",
+                #                 (json_string['sender'], json_string['message'], TCPHandler.username))
+                #     connection.commit()
+                #     cursor.close()
+                # else:
+                cursor.execute("INSERT INTO message(sender_username, content, receiver_username,is_new) VALUES(%s, %s, %s,True)",
+                            (json_string['sender'],json_string['message'], json_string['receiver']))
+                connection.commit()
+
+                cursor.execute('SELECT * FROM message WHERE sender_username = %s',
+                           (json_string['sender'],))
+                message = cursor.fetchall()
+                print(message)
+                cursor.close()
+                response = TCPHandler.generate_response(json.dumps({'result':True}).encode(),'application/json; charset=utf-8')
+                self.request.sendall(response)
+                
+
+                # else:
+                #     response = TCPHandler.generate_response(json.dumps({'result':False}).encode(),'application/json; charset=utf-8')
+                #     self.request.sendall(response)
+                
+                
 
             elif splitData[1] == b"/createvote":      
               

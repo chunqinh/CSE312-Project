@@ -5,7 +5,6 @@ use 312project_db;
 CREATE TABLE IF NOT EXISTS `user` (
     `username` VARCHAR(99) NOT NULL,
     `password` VARCHAR(99) NOT NULL,
-    `token` VARCHAR(99) DEFAULT 'No token',
     `is_online` BOOLEAN DEFAULT FALSE,
     `username_color` VARCHAR(99) DEFAULT '#000000',
     `bio` VARCHAR(99) DEFAULT 'No Bio',
@@ -39,7 +38,8 @@ CREATE TABLE IF NOT EXISTS `message` (
     `sender_username` VARCHAR(99) NOT NULL,
     `receiver_username` VARCHAR(99) NOT NULL,
     `content` VARCHAR(999) NOT NULL,
-    `message_time` DATETIME NOT NULL,
+    `is_new` BOOLEAN DEFAULT FALSE,
+    -- `message_time` DATETIME NOT NULL,
     PRIMARY KEY (`message_ID`),
     FOREIGN KEY (`sender_username`) REFERENCES `user`(`username`),
     FOREIGN KEY (`receiver_username`) REFERENCES `user`(`username`)
