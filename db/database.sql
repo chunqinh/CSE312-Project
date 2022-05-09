@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `voting` (
     `option_three_name` VARCHAR(99) DEFAULT NULL,
     `option_three_votes` INT DEFAULT 0,
     `option_four_name` VARCHAR(99) DEFAULT NULL,
-    ` option_four_votes` INT DEFAULT 0,
+    `option_four_votes` INT DEFAULT 0,
     `option_five_name` VARCHAR(99) DEFAULT NULL,
     `option_five_votes` INT DEFAULT 0,
     PRIMARY KEY (`vote_ID`),

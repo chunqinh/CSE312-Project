@@ -263,6 +263,26 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message += chr(int(i, 2))
                         print(message)
                         json_message = json.loads(message)
+                        connection = mysql.connector.connect(**TCPHandler.config)
+                        cursor = connection.cursor()
+                        if json_message["vote"] == "add-vote1":
+                            cursor.execute("SELECT option_one_name, option_one_votes FROM voting")
+                        elif json_message["vote"] == "add-vote2":
+                            cursor.execute("SELECT option_two_name, option_two_votes FROM voting")
+                        elif json_message["vote"] == "add-vote3":
+                            cursor.execute("SELECT option_three_name, option_three_votes FROM voting")
+                        elif json_message["vote"] == "add-vote4":
+                            cursor.execute("SELECT option_four_name, option_four_votes FROM voting")
+                        elif json_message["vote"] == "add-vote5":
+                            cursor.execute("SELECT option_five_name, option_five_votes FROM voting")
+                        votes = cursor.fetchall()
+                        current_vote_name = votes[len(votes)-1][0]
+                        current_vote_count = votes[len(votes)-1][1]
+                        current_vote_count += 1
+                        current_vote_count_string = str(current_vote_count)
+                        cursor.close()
+                        json_message["voteName"] = current_vote_name
+                        json_message["voteCount"] = current_vote_count_string
                         ws_frame = b''
                         text_byte = 129
                         ws_frame += text_byte.to_bytes(1, "big")
@@ -470,6 +490,36 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 cursor.close()
 
                 TCPHandler.voting_alive = True
+                self.request.sendall(
+                    "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+
+            elif splitData[1] == b'/add-vote':
+                decodedData = recievedData.decode()
+                vote_body = decodedData.split("\r\n\r\n")
+                vote_info = vote_body[1].split(",")
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                if vote_info[0] == "add-vote1":
+                    cursor.execute("UPDATE voting SET option_one_votes = %s WHERE vote_name = %s",
+                                   (vote_info[2], vote_info[1]))
+                elif vote_info[0] == "add-vote2":
+                    cursor.execute("UPDATE voting SET option_two_votes = %s WHERE vote_name = %s",
+                                   (vote_info[2], vote_info[1]))
+                elif vote_info[0] == "add-vote3":
+                    cursor.execute("UPDATE voting SET option_three_votes = %s WHERE vote_name = %s",
+                                   (vote_info[2], vote_info[1]))
+                elif vote_info[0] == "add-vote4":
+                    cursor.execute("UPDATE voting SET option_four_votes = %s WHERE vote_name = %s",
+                                   (vote_info[2], vote_info[1]))
+                elif vote_info[0] == "add-vote5":
+                    cursor.execute("UPDATE voting SET option_five_votes = %s WHERE vote_name = %s",
+                                   (vote_info[2], vote_info[1]))
+                else:
+                    print("Invalid Vote")
+                    return
+
+                connection.commit()
+                cursor.close()
                 self.request.sendall(
                     "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
 
