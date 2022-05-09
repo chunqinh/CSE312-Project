@@ -123,8 +123,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print(info[0])
                     color = info[0]
                     username = info[1]
-                    print("----------------color")
-                    print(color)
+                    # print("----------------color")
+                    # print(color)
                     content = TCPHandler.render_template("cse312-html/homepage-empty.html",
                                                             {"username": username, "username color": color})
                     response = TCPHandler.generate_response(content.encode(),

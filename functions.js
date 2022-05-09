@@ -68,7 +68,7 @@ function addUser(username) {
     }else{
         // user.innerHTML += "<li class='list-item' onclick='popup()' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
         // user.innerHTML += "<li class='list-item' onclick='popup(\''+ username['sender'] + '\')' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"<span/> </li>";
-        user.innerHTML += "<li class='list-item' onclick='popup(`"+ escapeHtml(username['sender']) +"`,`"+ escapeHtml(username['receiver'])+ "`,`"+username['chat_history']+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
+        user.innerHTML += "<li class='list-item' onclick='onclick_popup(`"+ escapeHtml(username['sender']) +"`,`"+ escapeHtml(username['receiver'])+ "`,`"+username['chat_history']+"`)' > <span style ='color:" + username['color']+ "'> " + username['receiver'] +"</span> </li>";
     }
 }
 
@@ -118,7 +118,7 @@ function fetchMessage(){
             const messages = JSON.parse(this.response);
             console.log(messages)
             if (messages['chat_history'] !=''){
-                popup(messages['sender'],messages['receiver'],messages['chat_history']);
+                sent_popup(messages['sender'],messages['receiver'],messages['chat_history']);
             }
             // for (const message of messages) {
             //     addMessage(message);
@@ -131,14 +131,16 @@ function fetchMessage(){
 
 
 
-function popup(sender, receiver, messages){
+function onclick_popup(sender, receiver, messages){
     console.log(sender)
     console.log(receiver)
     console.log(messages)
     let popup_sender = document.getElementById('sender');
     popup_sender.innerHTML =sender;
+    // popup_sender.innerHTML =receiver;
     let popup_receiver = document.getElementById('receiver');
     popup_receiver.innerHTML =receiver;
+    // popup_receiver.innerHTML =sender;
     let rece_message = document.getElementById('chat_history')
     rece_message.textContent = '';
     
@@ -153,6 +155,29 @@ function popup(sender, receiver, messages){
     modal.style.display = "block";
 }
 
+function sent_popup(sender, receiver, messages){
+    console.log(sender)
+    console.log(receiver)
+    console.log(messages)
+    let popup_sender = document.getElementById('sender');
+    // popup_sender.innerHTML =sender;
+    popup_sender.innerHTML =receiver;
+    let popup_receiver = document.getElementById('receiver');
+    // popup_receiver.innerHTML =receiver;
+    popup_receiver.innerHTML =sender;
+    let rece_message = document.getElementById('chat_history')
+    rece_message.textContent = '';
+    
+    const mess =JSON.parse(messages)
+    // console.log(mess)
+    for (const message of mess) {
+        addMessage(message);
+    }
+    
+    // rece_message.innerHTML = message
+    // sender, receiver, message
+    modal.style.display = "block";
+}
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
