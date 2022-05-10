@@ -30,19 +30,19 @@ class TCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         recievedData = self.request.recv(2048)
 
-        head = {}
+        # head = {}
         # print(received_data)
-        msg = recievedData.decode()
-        split_header = msg.split('\r\n')
+        # msg = recievedData.decode()
+        # split_header = msg.split('\r\n')
         # print(split_header)
-        for x in split_header:
-            if ": " in x:
-                key, value = x.split(": ")
-                head[key] = value
+        # for x in split_header:
+        #     if ": " in x:
+        #         key, value = x.split(": ")
+        #         head[key] = value
         cookie = ''
         xsrf_token = ''
-        if "Cookie" in head:
-            cookie = head["Cookie"]
+        # if "Cookie" in head:
+        #     cookie = head["Cookie"]
         print(recievedData)
         # print("createvote--------------------------------",recievedData) 
         # print("length------------------",len(recievedData))      
@@ -50,6 +50,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
         [request_line, headers_as_bytes, body] = split_request(recievedData)
         headers = parse_headers(headers_as_bytes)
         body_length = len(body)
+        if "Cookie" in headers.keys():
+            cookie = headers["Cookie"]
+
         if 'Content-Length' in headers.keys():
             Content_Length = int(headers['Content-Length'])
 
@@ -143,10 +146,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 if TCPHandler.voting_alive:
                     connection = mysql.connector.connect(**TCPHandler.config)
                     cursor = connection.cursor()
-                    cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
+                    cursor.execute('SELECT username_color, bio, username FROM user WHERE token = %s', (cookie,))
                     info = cursor.fetchone()
+                    username = info[2]
+                    bio = info[1]
                     color = info[0]
-                    username = info[1]
 
                     cursor.execute('SELECT * FROM voting ORDER BY vote_ID DESC LIMIT 1')
                     voting_info = cursor.fetchone()
@@ -178,19 +182,9 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         option5_display = "Display:inline"
 
                     if creator == username:
-                        end_vote_display ="Display:inline"
+                        end_vote_display = "Display:inline"
                     else:
                         end_vote_display = "Display:none"
-                    
-                    template_dict ={
-                        "option_votes_1": str(voting_info[6]),"option_name_1":voting_info[5], 
-                        "option_votes_2": str(voting_info[8]),"option_name_2":voting_info[7], 
-                        "option_votes_3": str(voting_info[10]),"option_name_3":voting_info[9],  "option3_display":option3_display, 
-                        "option_votes_4": str(voting_info[12]),"option_name_4":voting_info[11], "option4_display":option4_display,
-                        "option_votes_5": str(voting_info[14]),"option_name_5":voting_info[13], "option5_display":option5_display,
-                        "username": username, "Description":Description, "end_vote_display":end_vote_display, 
-                        "username color": color, "upload_file":upload_file,"Voting_Name":Voting_Name,"participants":participants
-                    }
 
                     template_dict = {
                         "option_votes_1": str(voting_info[6]), "option_name_1": voting_info[5],
@@ -201,7 +195,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         "option4_display": option4_display,
                         "option_votes_5": str(voting_info[14]), "option_name_5": voting_info[13],
                         "option5_display": option5_display,
-                        "username": TCPHandler.username, "Description": Description,
+                        "username": username, "Description": Description,
                         "end_vote_display": end_vote_display,
                         "username color": color, "upload_file": upload_file, "Voting_Name": Voting_Name,
                         "participants": participants
@@ -253,11 +247,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
             elif splitData[1] == b"/createvote":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
+                cursor.execute('SELECT username_color, bio, username FROM user WHERE token = %s', (cookie,))
                 info = cursor.fetchone()
+                username = info[2]
+                bio = info[1]
                 color = info[0]
-                username = info[1]
-                # print(username)
                 content = TCPHandler.render_template("cse312-html/createvote.html",
                                                      {"username": username, "username color": color})
                 response = TCPHandler.generate_response(content.encode(),
@@ -265,11 +259,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
                                                         "200 OK")
                 self.request.sendall(response)
 
-                # file_size_html = os.path.getsize('cse312-html/profile_edit.html')
-                # file_html = open("cse312-html/profile_edit.html", "r")
-                # read_html = file_html.read()
-                # frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(file_size_html) + "\r\nContent-Type: text/html;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_html
-                # self.request.sendall(frontend.encode())
 
             elif splitData[1] == b"/homepage_voting/websocket":
                 print("websocket")
