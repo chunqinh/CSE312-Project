@@ -31,6 +31,8 @@
   flex-direction: row;
   background-color: #dadada;
 }
+
+
 .createvote-text {
   left: 34px;
   bottom: 3px;
@@ -56,77 +58,77 @@
 .createvote-text04 {
   text-align: center;
 }
-.createvote-password {
-  top: 124px;
-  left: 10%;
+.voting_name_input {
+  top: 30px;
+  left: 0px;
   color: #000000;
   right: 10%;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-password1 {
-  top: 287px;
+.option1_input {
+  top: 30px;
   left: 0px;
   color: #000000;
   right: 0px;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-textarea {
-  top: 196px;
-  left: 134px;
+.voting_description {
+  top: 30px;
+  left: 0px;
   width: 634px;
   height: 58px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-password2 {
-  top: 453px;
+.option4_input {
+  top: 180px;
   left: 0px;
   color: #000000;
   right: 0px;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-password3 {
-  top: 342px;
+.option2_input {
+  top: 80px;
   left: 0px;
   color: #000000;
   right: 0px;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-password4 {
-  top: 397px;
+.option3_input {
+  top: 130px;
   left: 0px;
   color: #000000;
   right: 0px;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
 }
-.createvote-password5 {
-  top: 511px;
+.option5_input {
+  top: 230px;
   left: 0px;
   color: #000000;
   right: 0px;
   width: 629px;
-  height: 6%;
+  height: 40px;
   margin: auto;
   position: absolute;
   box-shadow: 5px 5px 10px 0px #d4d4d4;
@@ -147,14 +149,29 @@
   font-size: 18px;
 }
 .createvote-text08 {
-  top: 260px;
+  top: 265px;
   left: 135px;
   position: absolute;
   font-size: 18px;
 }
-.createvote-login-button {
-  left: 0px;
-  right: 0px;
+.createvote-button {
+  left: 10px;
+  right: 150px;
+  width: 104px;
+  bottom: 31px;
+  height: 30px;
+  margin: auto;
+  display: flex;
+  position: absolute;
+  box-shadow: 5px 5px 10px 0px #a69f9f;
+  text-align: center;
+  padding-left: 1px;
+  padding-right: 5px;
+  flex-direction: row;
+}
+.createvote-cancel-button {
+  left: 150px;
+  right: 10px;
   width: 104px;
   bottom: 31px;
   height: 30px;

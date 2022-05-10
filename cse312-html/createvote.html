@@ -53,60 +53,83 @@
       <link href="./createvote.css" rel="stylesheet" />
 
       <div class="createvote-container">
-        <form class="createvote-form">
-          <button class="createvote-create-button button">
-            <span class="createvote-text">
-              <span class="createvote-text01">Upload Your</span>
-              <br />
-              <span class="createvote-text03">Picture Here!</span>
-            </span>
-          </button>
+        <form class="createvote-form" method="post" enctype="multipart/form-data">
           <h2 class="createvote-heading">
             <span class="createvote-text04">Create an New Voting</span>
           </h2>
-          <input
+          <input class="createvote-create-button" type="file" name="upload">
+            <!-- <span class="createvote-text">
+              <span class="createvote-text01">Upload Your</span>
+              <br />
+              <span class="createvote-text03">Picture Here!</span>
+            </span> -->
+          </input>
+          <label class="createvote-text05">Voting name
+            <input
             type="text"
             placeholder="Voting name"
-            class="createvote-password input"
+            class="voting_name_input input"
+            name="voting name"
+            required
           />
-          <input
+          </label>
+
+          <label class="createvote-text06">Description
+            <textarea
+              placeholder="Description"
+              class="voting_description textarea"
+              name = "description"
+              required
+            ></textarea>
+          </label>
+
+          <label class="createvote-text08">Options        
+            <input
             type="text"
             placeholder="Option 1"
-            class="createvote-password1 input"
-          />
-          <textarea
-            placeholder="placeholder"
-            class="createvote-textarea textarea"
-          ></textarea>
-          <input
-            type="text"
-            placeholder="Option 4 (optional)"
-            class="createvote-password2 input"
+            class="option1_input input"
+            name="option 1"
+            required
           />
           <input
             type="text"
             placeholder="Option 2"
-            class="createvote-password3 input"
+            class="option2_input input"
+            name = "option 2"
+            required
           />
           <input
             type="text"
             placeholder="Option 3 (optional)"
-            class="createvote-password4 input"
+            class="option3_input input"
+            name = "option 3"
+          />
+          <input
+            type="text"
+            placeholder="Option 4 (optional)"
+            class="option4_input input"
+            name = "option 4"
           />
           <input
             type="text"
             placeholder="Option 5 (optional)"
-            class="createvote-password5 input"
+            class="option5_input input"
+            name = "option 5"
           />
-          <span class="createvote-text05">Voting name</span>
-          <span class="createvote-text06"><span>Description</span></span>
-          <span class="createvote-text08">Options</span>
-          <button class="createvote-login-button button">
+        </label> 
+         
+            
+          <button class="createvote-button button" type = "submit">
             <span class="createvote-text09">Create</span>
           </button>
+
+          <a href="/homepage" class="createvote-cancel-button button">
+            <span class="createvote-text09">Cancel</span>
+          </a>
+
         </form>
         <div class="createvote-container1">
-          <span class="createvote-text10">Username</span>
+          <span class="createvote-text10"  style="color:{{username color}}">{{username}}</span>
           <img
             alt="image"
             src="public/playground_assets/vote-200h.png"

@@ -50,6 +50,7 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <script src="../functions.js"></script>
     <div>
       <link href="./homepagewvoting-creator.css" rel="stylesheet" />
 
@@ -62,52 +63,77 @@
           </ul>
           <span class="homepagewvoting-creator-text03">Online number</span>
         </aside>
+        <!-- {{loop}}
+        <b>{{comment}}</b>: <img src="image/{{upload_file}}" alt="It's {{upload_file}}" class="my_image"/><br/>
+        {{end_loop}} -->
+        
         <main class="homepagewvoting-creator-container2">
           <div class="homepagewvoting-creator-container3">
-            <button class="homepagewvoting-creator-button button">
-              <span class="homepagewvoting-creator-text04">Option 5</span>
+
+            <button class="homepagewvoting-creator-button4 button" onclick="sendVote('add-vote1')">
+              <label id="vote1" class="homepagewvoting-creator-text08">{{option_name_1}}:   {{option_votes_1}}</label>
             </button>
-            <button class="homepagewvoting-creator-button1 button">
-              <span class="homepagewvoting-creator-text05">Option 3</span>
+
+            <button class="homepagewvoting-creator-button3 button" onclick="sendVote('add-vote2')">
+              <span id="vote2" class="homepagewvoting-creator-text07">{{option_name_2}}:   {{option_votes_2}}</span>
             </button>
-            <button class="homepagewvoting-creator-button2 button">
-              <span class="homepagewvoting-creator-text06">Option 4</span>
+            
+            <button class="homepagewvoting-creator-button1 button" onclick="sendVote('add-vote3')" style={{option3_display}} >
+              <span id="vote3" class="homepagewvoting-creator-text05">{{option_name_3}}:   {{option_votes_3}}</span>
             </button>
-            <button class="homepagewvoting-creator-button3 button">
-              <span class="homepagewvoting-creator-text07">Option 2</span>
+
+            <button class="homepagewvoting-creator-button2 button" onclick="sendVote('add-vote4')" style={{option4_display}}>
+              <span id="vote4" class="homepagewvoting-creator-text06" >{{option_name_4}}:   {{option_votes_4}}</span>
             </button>
-            <button class="homepagewvoting-creator-button4 button">
-              <span class="homepagewvoting-creator-text08">Option 1</span>
+
+            <button class="homepagewvoting-creator-button button" onclick="sendVote('add-vote5')" style={{option5_display}}>
+              <span id="vote5" class="homepagewvoting-creator-text04">{{option_name_5}}:   {{option_votes_5}}</span>
             </button>
+            
+
+
             <span class="homepagewvoting-creator-text09">Voting Options:</span>
           </div>
           <div class="homepagewvoting-creator-container4">
             <div class="homepagewvoting-creator-container5">
               <span class="homepagewvoting-creator-text10">Description:</span>
+              <br>
+              {{Description}}
             </div>
-            <h1 class="homepagewvoting-creator-text11">Voting Name</h1>
+            <h1 class="homepagewvoting-creator-text11">{{Voting_Name}}</h1>
             <img
-              alt="image"
-              src="https://play.teleporthq.io/static/svg/default-img.svg"
+            alt="It's {{upload_file}}"
+              src="/public/playground_assets/{{upload_file}}"
               class="homepagewvoting-creator-image"
             />
+            <!-- <img src="image/{{upload_file}}" alt="It's {{upload_file}}" class="my_image"/> -->
+
             <span class="homepagewvoting-creator-text12">
-              Total Participants:
+              Total Participants: {{participants}}
             </span>
-            <button class="homepagewvoting-creator-button5 button">
+            <button class="homepagewvoting-creator-button5 button" id ='end_vote' onclick="sendVote('end-vote')" style={{end_vote_display}}>
               End Vote
             </button>
           </div>
         </main>
         <div class="homepagewvoting-creator-container6">
-          <span class="homepagewvoting-creator-text13">Username</span>
+          <span class="homepagewvoting-creator-text13" style="color:{{username color}}">{{username}}</span>
           <img
             alt="image"
-            src="public/playground_assets/vote-200h.png"
+            src="/public/playground_assets/vote-200h.png"
             class="homepagewvoting-creator-image1"
           />
         </div>
       </div>
     </div>
+
+    <!-- <script>
+      function end_vote_hide() {
+        console.log()
+        var x = document.getElementById('end_vote');
+        x.style.display = 'none';
+      }
+    </script> -->
   </body>
 </html>
+
