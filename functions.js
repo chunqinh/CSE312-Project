@@ -1,5 +1,6 @@
 // Establish a WebSocket connection with the server
-const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+
+const socket = new WebSocket('ws://' + window.location.host + '/homepage_voting/websocket');
 // Get the modal
 var modal = document.getElementById("myModal");
 // Get the <span> element that closes the modal
@@ -10,35 +11,65 @@ var span = document.getElementsByClassName("close")[0];
 // var sender =''
 // var receiver =''
 
+
 function sendVote(vote) {
     socket.send(JSON.stringify({'vote': vote}));
 }
 
-function addVote(vote){
+function addVote(vote, voteName, voteCount){
+    const voteRequest = new XMLHttpRequest();
+    voteRequest.open("POST", "/add-vote")
+    voteRequest.send(vote + "," + voteName + "," + voteCount)
     if(vote === "add-vote1"){
-
+        const votes = document.getElementById("vote1")
+        votes.innerHTML =
+            `<label id="vote1" className="homepagewvoting-creator-text08">` + voteName + ": " + voteCount + "</label>"
     }
     else if(vote === "add-vote2"){
-
+        const votes = document.getElementById("vote2")
+        votes.innerHTML =
+            `<label id="vote2" className="homepagewvoting-creator-text07">` + voteName + ": " + voteCount + "</label>"
     }
     else if(vote === "add-vote3"){
-
+        const votes = document.getElementById("vote3")
+        votes.innerHTML =
+            `<label id="vote3" className="homepagewvoting-creator-text05">` + voteName + ": " + voteCount + "</label>"
     }
     else if(vote === "add-vote4"){
-
+        const votes = document.getElementById("vote4")
+        votes.innerHTML =
+            `<label id="vote4" className="homepagewvoting-creator-text06">` + voteName + ": " + voteCount + "</label>"
     }
     else if(vote === "add-vote5"){
-
+        const votes = document.getElementById("vote5")
+        votes.innerHTML =
+            `<label id="vote5" className="homepagewvoting-creator-text04">` + voteName + ": " + voteCount + "</label>"
     }
     else{
-        console.log("Invalid Vote");
+        console.log("Invalid Vote")
     }
+}
+
+function endVote(){
+    const voteRequest = new XMLHttpRequest();
+    voteRequest.open("GET", "/homepage")
+    voteRequest.send()
+    alert("Voting has ended, Please refresh the page")
 }
 
 socket.onmessage = function (ws_message) {
     const vote = JSON.parse(ws_message.data);
     const voteType = vote.vote;
-    addVote(voteType);
+    switch (voteType) {
+      case "end-vote":
+          endVote();
+          break;
+      default:
+          const voteName = vote.voteName;
+          const voteCount = vote.voteCount;
+          addVote(voteType, voteName, voteCount);
+          break;
+    }
 }
 
 function get_online_users() {
@@ -244,6 +275,4 @@ function welcome() {
     setInterval(get_online_users,1000);
     get_xsrf_token();
     // setInterval(get_xsrf_token,1000);
-
-
 }
