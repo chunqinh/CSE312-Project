@@ -39,6 +39,7 @@
   height: 518px;
   display: flex;
   align-items: flex-start;
+  overflow-y: auto;
 }
 .chatpage-container2 {
   top: 0px;

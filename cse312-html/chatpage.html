@@ -44,11 +44,12 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
+  <body onload="get_chat_history()">
     <div>
       <link href="./chatpage.css" rel="stylesheet" />
 
       <div class="chatpage-container">
+    
         <form class="chatpage-form">
           <button class="chatpage-button button"><span>Send</span></button>
           <input
@@ -56,7 +57,8 @@
             placeholder="placeholder"
             class="chatpage-textinput input"
           />
-          <div class="chatpage-container1"></div>
+          <div class="chatpage-container1" id=chat>
+          </div>
         </form>
         <div class="chatpage-container2">
           <span class="chatpage-text1">Username</span>
@@ -68,5 +70,6 @@
         </div>
       </div>
     </div>
+    <script src="../functions.js"></script>
   </body>
 </html>

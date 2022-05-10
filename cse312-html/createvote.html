@@ -129,14 +129,32 @@
 
         </form>
         <div class="createvote-container1">
-          <span class="createvote-text10"  style="color:{{username color}}">{{username}}</span>
-          <img
+          <a href="/">
+            <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
             class="createvote-image"
-          />
+            />
+          </a>
         </div>
       </div>
     </div>
+    <div class="homepage-empty-container3">
+
+      <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn" style="color:{{username color}}" >{{username}}</button>
+        <div id="myDropdown" class="dropdown-content">
+          <a href="/profile">Profile</a>
+          <a href="/logout">Log Out</a>
+        </div>
+      </div>
+
+      <img
+        alt="image"
+        src="public/playground_assets/vote-200h.png"
+        class="homepage-empty-image"
+      />
+    </div>
+    <script src="../functions.js"></script>
   </body>
 </html>

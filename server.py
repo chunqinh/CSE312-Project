@@ -1,17 +1,21 @@
+from cgitb import handler
 import socketserver
 import sys
 import json
 import os
 import hashlib
 import base64
+import secrets
 import mysql.connector
 from request import split_request, parse_headers
 import bcrypt
 
 
 class TCPHandler(socketserver.BaseRequestHandler):
-    username = ''
-    voting_alive = False
+
+    # username = ''
+    voting_alive =False
+
     # option_data =[]
 
     config = {
@@ -25,6 +29,24 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         recievedData = self.request.recv(2048)
+
+        head = {}
+        # print(received_data)
+        msg = recievedData.decode()
+        split_header = msg.split('\r\n')
+        # print(split_header)
+        for x in split_header:
+            if ": " in x:
+                key, value = x.split(": ")
+                head[key] = value
+        cookie = ''
+        xsrf_token = ''
+        if "Cookie" in head:
+            cookie = head["Cookie"]
+        print(recievedData)
+        # print("createvote--------------------------------",recievedData) 
+        # print("length------------------",len(recievedData))      
+
         [request_line, headers_as_bytes, body] = split_request(recievedData)
         headers = parse_headers(headers_as_bytes)
         body_length = len(body)
@@ -64,7 +86,6 @@ class TCPHandler(socketserver.BaseRequestHandler):
 
             # load js
             elif b"functions.js" in splitData[1]:
-
                 # file_size_css = os.path.getsize(css_path)
                 file_js = open("functions.js", "r")
                 read_js = file_js.read()
@@ -72,9 +93,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     len(read_js.encode())) + "\r\nContent-Type: text/css;\r\n X-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + read_js
                 self.request.sendall(style.encode())
 
-            # load image
+
+            #load image
             elif b"/public/playground_assets/" in splitData[1]:
-                img_path = "cse312-html/" + splitData[1].decode()
+                print(splitData[1])
+                img_path = "cse312-html"+splitData[1].decode()
+                print("---------------------",img_path)
+
                 img_header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg \r\nX-Content-Type-Options: nosniff \r\nContent-Length: "
                 with open(img_path, 'rb') as img_file:
                     img_content = img_file.read()
@@ -95,12 +120,18 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 else:
                     connection = mysql.connector.connect(**TCPHandler.config)
                     cursor = connection.cursor()
-                    cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                    cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
                     info = cursor.fetchone()
+                    print(info)
+                    print(info[0])
                     color = info[0]
 
+                    username = info[1]
+                    # print("----------------color")
+                    # print(color)
                     content = TCPHandler.render_template("cse312-html/homepage-empty.html",
-                                                         {"username": TCPHandler.username, "username color": color})
+                                                            {"username": username, "username color": color})
+
                     response = TCPHandler.generate_response(content.encode(),
                                                             "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                             "200 OK")
@@ -112,9 +143,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 if TCPHandler.voting_alive:
                     connection = mysql.connector.connect(**TCPHandler.config)
                     cursor = connection.cursor()
-                    cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                    cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
                     info = cursor.fetchone()
                     color = info[0]
+                    username = info[1]
 
                     cursor.execute('SELECT * FROM voting ORDER BY vote_ID DESC LIMIT 1')
                     voting_info = cursor.fetchone()
@@ -145,10 +177,20 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     else:
                         option5_display = "Display:inline"
 
-                    if creator == TCPHandler.username:
-                        end_vote_display = "Display:inline"
+                    if creator == username:
+                        end_vote_display ="Display:inline"
                     else:
                         end_vote_display = "Display:none"
+                    
+                    template_dict ={
+                        "option_votes_1": str(voting_info[6]),"option_name_1":voting_info[5], 
+                        "option_votes_2": str(voting_info[8]),"option_name_2":voting_info[7], 
+                        "option_votes_3": str(voting_info[10]),"option_name_3":voting_info[9],  "option3_display":option3_display, 
+                        "option_votes_4": str(voting_info[12]),"option_name_4":voting_info[11], "option4_display":option4_display,
+                        "option_votes_5": str(voting_info[14]),"option_name_5":voting_info[13], "option5_display":option5_display,
+                        "username": username, "Description":Description, "end_vote_display":end_vote_display, 
+                        "username color": color, "upload_file":upload_file,"Voting_Name":Voting_Name,"participants":participants
+                    }
 
                     template_dict = {
                         "option_votes_1": str(voting_info[6]), "option_name_1": voting_info[5],
@@ -180,14 +222,15 @@ class TCPHandler(socketserver.BaseRequestHandler):
             elif splitData[1] == b"/profile":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT username_color, bio FROM user WHERE username = %s', (TCPHandler.username,))
+                cursor.execute('SELECT username_color, bio, username FROM user WHERE token = %s', (cookie,))
                 info = cursor.fetchone()
+                username = info[2]
                 bio = info[1]
                 color = info[0]
 
                 content = TCPHandler.render_template("cse312-html/profile.html",
                                                      {"bio": escape_html(bio), "username color": color,
-                                                      "username": TCPHandler.username})
+                                                      "username": username})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
@@ -196,11 +239,12 @@ class TCPHandler(socketserver.BaseRequestHandler):
             elif splitData[1] == b"/profile_edit":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
                 info = cursor.fetchone()
                 color = info[0]
+                username = info[1]
                 content = TCPHandler.render_template("cse312-html/profile_edit.html",
-                                                     {"username": TCPHandler.username, "username color": color})
+                                                     {"username": username, "username color": color})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
@@ -209,11 +253,13 @@ class TCPHandler(socketserver.BaseRequestHandler):
             elif splitData[1] == b"/createvote":
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute('SELECT username_color FROM user WHERE username = %s', (TCPHandler.username,))
+                cursor.execute('SELECT username_color, username FROM user WHERE token = %s', (cookie,))
                 info = cursor.fetchone()
                 color = info[0]
+                username = info[1]
+                # print(username)
                 content = TCPHandler.render_template("cse312-html/createvote.html",
-                                                     {"username": TCPHandler.username, "username color": color})
+                                                     {"username": username, "username color": color})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",
                                                         "200 OK")
@@ -296,9 +342,123 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         for connection in TCPHandler.websocket_connections:
                             connection.request.sendall(ws_frame)
 
+            elif splitData[1] == b"/online_users":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username, username_color FROM user WHERE is_online = True')
+                info = cursor.fetchall()
+                cursor.execute('SELECT username FROM user WHERE is_online = True AND token = %s', (cookie,))
+                sender = cursor.fetchone()
+                print(info)
+                lis = []
+                for x in info:
+                    dic = {}
+                    dic["sender"] = sender[0]
+                    dic["receiver"] = x[0]
+                    dic["color"] = x[1]
+                    cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC ', (sender[0],x[0],sender[0],x[0]))
+                    messages = cursor.fetchall()
+                    print(messages)
+                    list_messages =[]
+                    for message in messages:
+                        message_dic ={}
+                        message_dic['sender'] =message[1]
+                        message_dic['receiver'] =message[2]
+                        message_dic['message'] =message[3]
+                        list_messages.append(message_dic)
+                    dic["chat_history"] = json.dumps(list_messages)
+                    lis.append(dic)
+                print(lis)
+                response = TCPHandler.generate_response(json.dumps(lis).encode(),'application/json; charset=utf-8')
+                self.request.sendall(response)
+
+            elif b"/chat=" in splitData[1]:
+                file_html = open("cse312-html/chatpage.html", "r")
+                read_html = file_html.read()
+                frontend = "HTTP/1.1 200 OK\r\nContent-Length: " + str(
+                    len(read_html.encode())) + "\r\nContent-Type: text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff\r\n\r\n" + read_html
+                self.request.sendall(frontend.encode())
+
+            elif splitData[1] == b"/get-message":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT username FROM user WHERE is_online = True AND token = %s', (cookie,))
+                receiver = cursor.fetchone()
+                cursor.execute('SELECT * FROM message WHERE receiver_username =%s AND is_new=%s ORDER BY message_ID ASC LIMIT 1', (receiver[0],True))
+                oldest_new_message = cursor.fetchall()
+                if oldest_new_message:
+                    print(oldest_new_message)
+                    sender_info = oldest_new_message[0][1]
+                    print(sender_info)
+                    print(type(sender_info))
+                    
+
+                    cursor.execute('UPDATE message SET is_new = False WHERE receiver_username =%s AND sender_username = %s',
+                            (receiver[0],sender_info))
+                    connection.commit()
+                    cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC ', (receiver[0],sender_info,receiver[0],sender_info))
+                    messages = cursor.fetchall()
+
+                    # lis=[]
+                    dic = {}
+                    dic["sender"] =sender_info
+                    dic["receiver"] = receiver[0]
+                    # dic["color"] = x[1]
+                    # cursor.execute('SELECT * FROM message WHERE (sender_username = %s AND receiver_username =%s) OR (receiver_username = %s AND sender_username =%s) ORDER BY message_ID ASC LIMIT 1', (TCPHandler.username,x[0],TCPHandler.username,x[0]))
+                    # messages = cursor.fetchall()
+                    # print(messages)
+                    list_messages =[]
+                    for message in messages:
+                        message_dic ={}
+                        message_dic['sender'] =message[1]
+                        message_dic['receiver'] =message[2]
+                        message_dic['message'] =message[3]
+                        list_messages.append(message_dic)
+                    dic["chat_history"] = json.dumps(list_messages)
+                    print("__________________________new message")
+
+                    response = TCPHandler.generate_response(json.dumps(dic).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
+                else:
+                    print("no new message --------------------")
+                    response = TCPHandler.generate_response(json.dumps({'sender':'','receiver':'','chat_history':''}).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
+
+            elif splitData[1] == b"/get_xsrf_token":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT xsrf_token FROM user WHERE token = %s', (cookie,))
+                xsrf_token = cursor.fetchone()
+                cursor.close()
+                print('------------------------------------------/get_xsrf_token',xsrf_token)
+                response = TCPHandler.generate_response(json.dumps(xsrf_token[0]).encode(), 'application/json; charset=utf-8', '200 OK')
+                self.request.sendall( response)
+                
+            
+            # logout
+            elif splitData[1] == b"/logout":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('UPDATE user SET is_online = FALSE WHERE token = %s',(cookie,))
+                connection.commit()
+                cursor.close()
+                self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: id=none; Max-Age=-1\r\nLocation: / \r\n\r\n".encode())
 
             # login page
             elif splitData[1] == b"/":
+                if cookie != '':
+                    connection = mysql.connector.connect(**TCPHandler.config)
+                    cursor = connection.cursor()
+                    cursor.execute('SELECT * FROM user WHERE token = %s', (cookie,))
+                    info = cursor.fetchone()
+                    if info:
+                        if TCPHandler.voting_alive:
+                            self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage_voting \r\n\r\n".encode())
+                        else:
+                            self.request.sendall("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+
+                print(recievedData)
+                
                 # file_size_html = os.path.getsize('cse312-html/login.html')
                 file_html = open("cse312-html/login.html", "r")
                 read_html = file_html.read()
@@ -307,7 +467,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 self.request.sendall(frontend.encode())
 
 
-
+                
 
         # signup
         elif splitData[0] == b"POST":
@@ -335,12 +495,14 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_username = x[start_index_username + len(start_username):]
                         size_username = len(need_username)
                         insert_username = need_username[:size_username - len(b'\r\n')].decode()
+                        insert_username = escape_html(insert_username)
 
                     elif start_password in x:
                         start_index_password = x.find(start_password)
                         need_password = x[start_index_password + len(start_password):]
                         size_password = len(need_password)
                         insert_password = need_password[:size_password - len(b'\r\n')].decode()
+                        insert_password = escape_html(insert_password)
 
                     elif start_password2 in x:
                         start_index_password2 = x.find(start_password2)
@@ -348,6 +510,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_password2 = len(need_password2)
                         last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         password2 = need_password2[:size_password2 - len(last_boundary)].decode()
+                        password2 = escape_html(password2)
+
 
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
@@ -359,6 +523,10 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 if insert_password != password2:
                     self.request.sendall(
                         "HTTP/1.1 403 Forbidden\r\nContent Length: 22\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nPasswords do not match".encode())
+                # elif '&' or '/' in insert_username:
+                #     self.request.sendall(
+                #         "HTTP/1.1 403 Forbidden\r\nContent Length: 45\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\nYour username cannot contain html characters.".encode())
+            
                 elif account:
                     taken = "Username already exists"
                     self.request.sendall(("HTTP/1.1 403 Forbidden\r\nContent-Length: " + str(
@@ -393,6 +561,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_username = x[start_index_username + len(start_username):]
                         size_username = len(need_username)
                         insert_username = need_username[:size_username - len(b'\r\n')].decode()
+                        insert_username = escape_html(insert_username)
 
                     elif start_password in x:
                         start_index_password = x.find(start_password)
@@ -400,16 +569,37 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_password = len(need_password)
                         last_boundary = b'\r\n' + boundary + b'--\r\n'  # \r\n-- + boundary + --
                         insert_password = need_password[:size_password - len(last_boundary)].decode()
+                        insert_password= escape_html(insert_password)
 
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
                 cursor.execute('SELECT password FROM user WHERE username = %s',
                                (insert_username,))
                 account = cursor.fetchone()
-                if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
-                    TCPHandler.username = insert_username
-                    self.request.sendall(
-                        "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /homepage \r\n\r\n".encode())
+
+                if account:
+                    print(account[0])
+                    if bcrypt.checkpw(insert_password.encode(), account[0].encode()):
+                        print("mtach")
+                        auth_token = secrets.token_urlsafe()
+                        salt = bcrypt.gensalt()
+                        hash_token = b'id=' + bcrypt.hashpw(auth_token.encode(), salt)
+                        print(hash_token)
+                        cursor.execute('UPDATE user SET token = %s, is_online = True WHERE username = %s',
+                        (hash_token.decode(), insert_username,))
+                        connection.commit()
+
+                        xsrf_token = secrets.token_urlsafe(20)
+                        cursor.execute('UPDATE user SET xsrf_token = %s WHERE username = %s',(xsrf_token,insert_username,))
+                        connection.commit()
+                        
+                        self.request.sendall(("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: "+ hash_token.decode() +"; Max-Age=3600; HttpOnly\r\nLocation: /homepage \r\n\r\n").encode())
+                    else:
+                        print("not match")
+                        invaild = "Wrong Password or Account doesn't exist"
+                        self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(
+                            len(invaild)) + "\r\nContent-Type: text/html;\r\nX-Content-Type-Options: nosniff\r\n charset=utf-8\r\n\r\n" + invaild).encode())
+
                 else:
                     invaild = "Wrong Password or Account doesn't exist"
                     self.request.sendall(("HTTP/1.1 404 Not Found\r\nContent-Length: " + str(
@@ -440,6 +630,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         need_bio = x[start_index_bio + len(start_bio):]
                         size_bio = len(need_bio)
                         new_bio = need_bio[:size_bio - len(b'\r\n')].decode()
+                        new_bio = escape_html(new_bio)
 
                     elif start_color in x:
                         start_index_color = x.find(start_color)
@@ -447,18 +638,68 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         size_color = len(need_color)
                         last_boundary = b'\r\n' + boundary + b'--'  # \r\n-- + boundary + --
                         new_color = need_color[:size_color - len(last_boundary)].decode()
-
+                        
 
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
-                cursor.execute("UPDATE user SET bio = %s,username_color = %s WHERE username = %s",
-                               (new_bio, new_color, TCPHandler.username))
+                cursor.execute("UPDATE user SET bio = %s,username_color = %s WHERE token = %s",
+                               (new_bio, new_color, cookie,))
                 connection.commit()
                 cursor.close()
                 self.request.sendall(
                     "HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nLocation: /profile \r\n\r\n".encode())
 
-            elif splitData[1] == b"/createvote":
+
+            elif splitData[1] == b"/direct-message":
+                # ("print ___________DM")
+                [request_line, headers_as_bytes, body] = split_request(recievedData)
+                json_string = json.loads(body)
+                print(json_string)
+                # if json_string['receiver'] == TCPHandler.username:
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                # cursor.execute('SELECT sender_username FROM message WHERE receiver_username = %s',
+                #            (TCPHandler.username,))
+                # message = cursor.fetchone()
+                # if message:
+                #     cursor.execute("UPDATE message SET sender_username = %s, content =%s WHERE receiver_username = %s",
+                #                 (json_string['sender'], json_string['message'], TCPHandler.username))
+                #     connection.commit()
+                #     cursor.close()
+                # else:
+
+                #check if xsrf_token match
+                xsrf_token = json_string['xsrf_token']
+                cursor.execute('SELECT username FROM user WHERE xsrf_token = %s', (xsrf_token,))
+                username = cursor.fetchone()[0]
+                print('------------------------------------------------------------',username)
+                if username == json_string['sender']:
+
+                    #update database
+                    cursor.execute("INSERT INTO message(sender_username, content, receiver_username,is_new) VALUES(%s, %s, %s,True)",
+                                (json_string['sender'],json_string['message'], json_string['receiver']))
+                    connection.commit()
+
+                    cursor.execute('SELECT * FROM message WHERE sender_username = %s',
+                            (json_string['sender'],))
+                    message = cursor.fetchall()
+                    print(message)
+                    cursor.close()
+                    response = TCPHandler.generate_response(json.dumps({'result':True}).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
+                    
+
+                    # else:
+                    #     response = TCPHandler.generate_response(json.dumps({'result':False}).encode(),'application/json; charset=utf-8')
+                    #     self.request.sendall(response)
+                else:
+                    self.request.sendall(
+                        "HTTP/1.1 403 Forbidden\r\nContent Length: 3\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\n403".encode())
+                
+                
+
+            elif splitData[1] == b"/createvote":      
+              
 
                 boundary = find_boundary(recievedData)
                 form_data = recievedData.split(boundary)
@@ -469,21 +710,32 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     file_name = 'vote-200h.png'
 
                 vote_name = getData(form_data[2].decode())
+                vote_name = escape_html(vote_name)
                 description = getData(form_data[3].decode())
+                description = escape_html(description)
                 option_1 = getData(form_data[4].decode())
+                option_1= escape_html(option_1)
                 option_2 = getData(form_data[5].decode())
+                option_2= escape_html(option_2)
                 option_3 = getData(form_data[6].decode())
+                option_3= escape_html(option_3)
                 option_4 = getData(form_data[7].decode())
+
+                option_4= escape_html(option_4)
+                print("option_4----------------------------------------",option_4)
                 option_5 = getData(form_data[8].decode())
-
-
+                option_5= escape_html(option_5)
+                print("option_5----------------------------------------",option_5)
                 connection = mysql.connector.connect(**TCPHandler.config)
                 cursor = connection.cursor()
 
-                cursor.execute(
-                    "INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name, option_four_name, option_five_name) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (TCPHandler.username, vote_name, description, file_name, option_1, option_2, option_3, option_4,
-                     option_5))
+                cursor.execute('SELECT username FROM user WHERE token = %s', (cookie,))
+                creator = cursor.fetchone()
+                # print(creator[0])
+                # print("hello")
+                cursor.execute("INSERT INTO voting(creator_username, vote_name, vote_description, photo, option_one_name, option_two_name, option_three_name, option_four_name, option_five_name) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                    (creator[0],vote_name, description, file_name ,option_1, option_2, option_3, option_4, option_5 ))
+
                 connection.commit()
 
                 cursor.execute("SELECT * FROM voting")
@@ -655,7 +907,7 @@ def store_image(image):
 
 
 def escape_html(input):
-    return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    return input.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace("'","&#39;").replace('"',"&quot;").replace("/","&#47;")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,44 @@
       html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6 {  margin: 0;  padding: 0;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="submit"] {  -webkit-appearance: button;}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner {  border-style: none;  padding: 0;}button:-moz-focus,[type="button"]:-moz-focus,[type="reset"]:-moz-focus,[type="submit"]:-moz-focus {  outline: 1px dotted ButtonText;}a {  color: inherit;  text-decoration: inherit;}input {  padding: 2px 4px;}img {  display: block;}
     </style>
     <style>
+      /* The Modal (background) */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+
+      /* Modal Content */
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+
+      /* The Close Button */
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
       html {
         font-family: Inter;
         font-size: 16px;
@@ -34,6 +72,20 @@
         background-color: var(--dl-color-gray-white);
 
       }
+      .vote_logo{
+        height: 100px;
+        padding: 20px;
+      }
+      .chathistory-container {
+        width: 100%;
+        display: flex;
+        overflow: auto;
+        height: auto;
+        /* min-height: 100vh; */
+        /* align-items: center; */
+        flex-direction: column;
+        justify-content: center;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -49,19 +101,16 @@
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
-    <script src="../functions.js"></script>
+
+  <body onload="welcome()">
+
     <div>
       <link href="./homepagewvoting-creator.css" rel="stylesheet" />
 
       <div class="homepagewvoting-creator-container">
         <aside class="homepagewvoting-creator-container1">
-          <ul class="homepagewvoting-creator-ul list">
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
-            <li class="list-item"><span>Text</span></li>
-          </ul>
-          <span class="homepagewvoting-creator-text03">Online number</span>
+          <ul class="homepage-empty-ul list" id="user"></ul>
+          <span class="homepagewvoting-creator-text03">Online Users</span>
         </aside>
         <!-- {{loop}}
         <b>{{comment}}</b>: <img src="image/{{upload_file}}" alt="It's {{upload_file}}" class="my_image"/><br/>
@@ -96,9 +145,13 @@
           </div>
           <div class="homepagewvoting-creator-container4">
             <div class="homepagewvoting-creator-container5">
-              <span class="homepagewvoting-creator-text10">Description:</span>
-              <br>
-              {{Description}}
+              <span class="homepagewvoting-creator-text10">Description:
+                </br>
+                {{Description}}
+              </span>
+              </br>
+              </br>
+              <!-- {{Description}} -->
             </div>
             <h1 class="homepagewvoting-creator-text11">{{Voting_Name}}</h1>
             <img
@@ -117,12 +170,43 @@
           </div>
         </main>
         <div class="homepagewvoting-creator-container6">
-          <span class="homepagewvoting-creator-text13" style="color:{{username color}}">{{username}}</span>
-          <img
+          <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn" style="color:{{username color}}" >{{username}}</button>
+            <div id="myDropdown" class="dropdown-content">
+              <a href="/profile">Profile</a>
+              <a href="/logout">Log Out</a>
+            </div>
+          </div>
+          <a href="/">
+            <img
             alt="image"
-            src="/public/playground_assets/vote-200h.png"
-            class="homepagewvoting-creator-image1"
-          />
+            src="public/playground_assets/vote-200h.png"
+            class="createvote-image"
+            />
+          </a>
+        </div>
+      </div>
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div id="sender" hidden></div><h2>Chat</h2><div id="receiver" hidden></div >
+          <!-- <div hidden>From: <div id="sender" hidden></div></div >
+          <div hidden>To: <div id="receiver" hidden></div ></div> -->
+          </br>
+          <div class="chathistory-container" id="chat_history">
+
+          </div>
+          </br>
+          <div id="show_send_message"></div>
+          </br>
+          <input id="send_message" type="text" class="input" name="send_message">
+          <input id="xsrf_token" name="xsrf_token" hidden>
+          <button class="popup_button button" onclick="sendMessage()">
+            <span class="popup-text04">Send</span>
+          </button>
         </div>
       </div>
     </div>
@@ -134,6 +218,7 @@
         x.style.display = 'none';
       }
     </script> -->
+    <script src="../functions.js"></script>
   </body>
 </html>
 
