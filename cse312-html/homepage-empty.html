@@ -128,11 +128,13 @@
             </div>
           </div>
 
-          <img
+          <a href="/">
+            <img
             alt="image"
             src="public/playground_assets/vote-200h.png"
-            class="homepage-empty-image"
-          />
+            class="createvote-image"
+            />
+          </a>
         </div>
 
         </div>
@@ -146,8 +148,9 @@
         <!-- Modal content -->
         <div class="modal-content">
           <span class="close">&times;</span>
-          <div>From: <div id="sender"></div></div>
-          <div>To: <div id="receiver"></div></div>
+          <div id="sender" hidden></div><h2>Chat</h2><div id="receiver" hidden></div >
+          <!-- <div hidden>From: <div id="sender" hidden></div></div >
+          <div hidden>To: <div id="receiver" hidden></div ></div> -->
           </br>
           <div class="chathistory-container" id="chat_history">
 
@@ -156,7 +159,9 @@
           <div id="show_send_message"></div>
           </br>
           <input id="send_message" type="text" class="input" name="send_message">
-          <button onclick="sendMessage()">Send</button>
+          <button class="popup_button button" onclick="sendMessage()">
+            <span class="popup-text04">Send</span>
+          </button>
         </div>
 
       </div>

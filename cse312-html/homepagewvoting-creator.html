@@ -72,6 +72,20 @@
         background-color: var(--dl-color-gray-white);
 
       }
+      .vote_logo{
+        height: 100px;
+        padding: 20px;
+      }
+      .chathistory-container {
+        width: 100%;
+        display: flex;
+        overflow: auto;
+        height: auto;
+        /* min-height: 100vh; */
+        /* align-items: center; */
+        flex-direction: column;
+        justify-content: center;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -129,9 +143,13 @@
           </div>
           <div class="homepagewvoting-creator-container4">
             <div class="homepagewvoting-creator-container5">
-              <span class="homepagewvoting-creator-text10">Description:</span>
-              <br>
-              {{Description}}
+              <span class="homepagewvoting-creator-text10">Description:
+                </br>
+                {{Description}}
+              </span>
+              </br>
+              </br>
+              <!-- {{Description}} -->
             </div>
             <h1 class="homepagewvoting-creator-text11">{{Voting_Name}}</h1>
             <img
@@ -157,11 +175,13 @@
               <a href="/logout">Log Out</a>
             </div>
           </div>
-          <img
+          <a href="/">
+            <img
             alt="image"
-            src="/public/playground_assets/vote-200h.png"
-            class="homepagewvoting-creator-image1"
-          />
+            src="public/playground_assets/vote-200h.png"
+            class="createvote-image"
+            />
+          </a>
         </div>
       </div>
       <!-- The Modal -->
@@ -170,19 +190,21 @@
         <!-- Modal content -->
         <div class="modal-content">
           <span class="close">&times;</span>
-          <div>From: <div id="sender"></div></div>
+          <div id="sender" hidden></div><h2>Chat</h2><div id="receiver" hidden></div >
+          <!-- <div hidden>From: <div id="sender" hidden></div></div >
+          <div hidden>To: <div id="receiver" hidden></div ></div> -->
           </br>
-          <div>To: <div id="receiver"></div></div>
-          </br>
-          <div id="received_message"></div>
+          <div class="chathistory-container" id="chat_history">
+
+          </div>
           </br>
           <div id="show_send_message"></div>
           </br>
-          </br>
           <input id="send_message" type="text" class="input" name="send_message">
-          <button onclick="sendMessage()">Send</button>
+          <button class="popup_button button" onclick="sendMessage()">
+            <span class="popup-text04">Send</span>
+          </button>
         </div>
-
       </div>
     </div>
 

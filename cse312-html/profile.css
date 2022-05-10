@@ -119,6 +119,11 @@
   border-style: dashed;
   border-width: 1px;
 }
+.createvote-image {
+  display: block;
+  height: 100px;
+  padding: 20px;
+}
 .profile-text10 {
   top: 51px;
   right: 61px;

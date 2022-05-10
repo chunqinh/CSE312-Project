@@ -211,13 +211,13 @@
   font-size: 20px;
   text-transform: capitalize;
 }
-.createvote-image {
+/* .createvote-image {
   top: 21px;
   left: 27px;
   width: 4%;
   position: absolute;
   object-fit: cover;
-}
+} */
 .dropbtn {
   background-color: #ffffff00;
   padding: 16px;
@@ -259,6 +259,12 @@
   display: block;
   font-size: 14px;
 }
+.createvote-image {
+  display: block;
+  height: 100px;
+  padding: 20px;
+}
+
 
 .dropdown a:hover {background-color: #ddd;}
 

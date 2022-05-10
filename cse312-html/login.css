@@ -12,6 +12,11 @@
   list-style-image: none;
   list-style-position: outside;
 }
+.createvote-image {
+  display: block;
+  height: 100px;
+  padding: 20px;
+}
 .login-form {
   top: 30%;
   left: 25%;

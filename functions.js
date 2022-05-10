@@ -76,7 +76,9 @@ function addUser(username) {
 function addMessage(chatMessage) {
     let chat = document.getElementById('chat_history');
     console.log(chatMessage);
-    chat.innerHTML += "<b>" + chatMessage['sender'] + "</b>: " + chatMessage["message"] + "<br/>";
+    // chat.innerHTML += "<b>" + chatMessage['sender'] + "</b>: " + chatMessage["message"] + "</br>";
+    // + "<br/>"
+    chat.innerHTML += "<p><b>"+chatMessage['sender'] +"</b>: "  + chatMessage["message"] + "</p></br>";
 }
 
 function sendMessage() {
@@ -87,7 +89,8 @@ function sendMessage() {
     chatBox.value = "";
     // const send_message = document.getElementById("show_send_message");
     const send_message = document.getElementById('chat_history');
-    send_message.innerHTML += "<b>" + sender + "</b>: " + message + "<br/>";
+    send_message.innerHTML += "<p><b>"+sender +"</b>: "  + message + "</p></br>";
+    // "<b>" + sender + "</b>: " + message + "<br/>";
     // send_message.textContent += sender +": "+message;
     chatBox.focus();
     if (message !== "") {

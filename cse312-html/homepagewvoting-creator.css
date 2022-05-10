@@ -7,6 +7,11 @@
   flex-direction: column;
   justify-content: flex-start;
 }
+.createvote-image {
+  display: block;
+  height: 100px;
+  padding: 20px;
+}
 .homepagewvoting-creator-container1 {
   top: 10%;
   right: 0px;
@@ -280,6 +285,28 @@
   text-decoration: none;
   display: block;
   font-size: 14px;
+}
+
+.popup_button {
+  left: 469px;
+  width: 97px;
+  height: 29px;
+  margin: auto; 
+  /* display: flex; */
+  position: absolute;
+  font-size: 17px;
+  box-shadow: 5px 5px 10px 0px #a69f9f;
+  text-align: center;
+  padding-left: 6px;
+  padding-right: 5px;
+  flex-direction: row;
+}
+.popup-text04 {
+  top: 4px;
+  left: 26px;
+  margin: auto;
+  align-self: center;
+  position: absolute;
 }
 
 .dropdown a:hover {background-color: #ddd;}

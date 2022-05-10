@@ -12,12 +12,17 @@
   list-style-image: none;
   list-style-position: outside;
 }
+.createvote-image {
+  display: block;
+  height: 100px;
+  padding: 20px;
+}
 .signup-form {
   top: 30%;
   left: 25%;
   right: 25%;
   width: 600px;
-  height: 382px;
+  height: 440px;
   margin: auto;
   position: absolute;
   align-self: center;
@@ -105,7 +110,7 @@
 .signup-text4 {
   left: 5%;
   right: 5%;
-  bottom: 6px;
+  bottom: 8px;
   margin: auto;
   position: absolute;
   align-self: center;

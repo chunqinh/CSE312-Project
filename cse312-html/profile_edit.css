@@ -6,6 +6,11 @@
     align-items: center;
     flex-direction: column;
   }
+  .createvote-image {
+    display: block;
+    height: 100px;
+    padding: 20px;
+  }
   .profile-form {
     top: 0px;
     left: 0px;
