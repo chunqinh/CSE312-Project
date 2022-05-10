@@ -54,7 +54,8 @@ function endVote(){
     const voteRequest = new XMLHttpRequest();
     voteRequest.open("GET", "/homepage")
     voteRequest.send()
-    alert("Voting has ended, Please refresh the page")
+    alert("Voting has ended")
+    window.location.reload()
 }
 
 socket.onmessage = function (ws_message) {
