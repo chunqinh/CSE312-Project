@@ -115,7 +115,8 @@ function addMessage(chatMessage) {
 
 function sendMessage() {
     const chatBox = document.getElementById("send_message");
-    const message = chatBox.value;
+    let message = chatBox.value;
+    message = escapeHtml(message);
     const sender = document.getElementById("sender").textContent;
     const receiver = document.getElementById("receiver").textContent;
     const xsrf_token = document.getElementById("xsrf_token").value;
@@ -173,10 +174,10 @@ function onclick_popup(sender, receiver, messages){
     console.log(receiver)
     console.log(messages)
     let popup_sender = document.getElementById('sender');
-    popup_sender.innerHTML =sender;
+    popup_sender.innerHTML =escapeHtml(sender);
     // popup_sender.innerHTML =receiver;
     let popup_receiver = document.getElementById('receiver');
-    popup_receiver.innerHTML =receiver;
+    popup_receiver.innerHTML =escapeHtml(receiver);
     // popup_receiver.innerHTML =sender;
     let rece_message = document.getElementById('chat_history')
     rece_message.textContent = '';
@@ -198,10 +199,10 @@ function sent_popup(sender, receiver, messages){
     console.log(messages)
     let popup_sender = document.getElementById('sender');
     // popup_sender.innerHTML =sender;
-    popup_sender.innerHTML =receiver;
+    popup_sender.innerHTML =escapeHtml(receiver);
     let popup_receiver = document.getElementById('receiver');
     // popup_receiver.innerHTML =receiver;
-    popup_receiver.innerHTML =sender;
+    popup_receiver.innerHTML =escapeHtml(sender);
     let rece_message = document.getElementById('chat_history')
     rece_message.textContent = '';
     

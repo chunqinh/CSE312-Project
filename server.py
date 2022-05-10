@@ -223,7 +223,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 color = info[0]
 
                 content = TCPHandler.render_template("cse312-html/profile.html",
-                                                     {"bio": escape_html(bio), "username color": color,
+                                                     {"bio": bio, "username color": color,
                                                       "username": username})
                 response = TCPHandler.generate_response(content.encode(),
                                                         "text/html; charset=utf-8\r\nX-Content-Type-Options: nosniff",

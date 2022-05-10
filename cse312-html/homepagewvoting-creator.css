@@ -195,7 +195,7 @@
   width: 35%;
   height: 70%;
   position: absolute;
-  object-fit: cover;
+  /* object-fit: cover; */
 }
 .homepagewvoting-creator-text12 {
   top: 30%;
