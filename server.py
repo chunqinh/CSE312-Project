@@ -263,26 +263,29 @@ class TCPHandler(socketserver.BaseRequestHandler):
                             message += chr(int(i, 2))
                         print(message)
                         json_message = json.loads(message)
-                        connection = mysql.connector.connect(**TCPHandler.config)
-                        cursor = connection.cursor()
-                        if json_message["vote"] == "add-vote1":
-                            cursor.execute("SELECT option_one_name, option_one_votes FROM voting")
-                        elif json_message["vote"] == "add-vote2":
-                            cursor.execute("SELECT option_two_name, option_two_votes FROM voting")
-                        elif json_message["vote"] == "add-vote3":
-                            cursor.execute("SELECT option_three_name, option_three_votes FROM voting")
-                        elif json_message["vote"] == "add-vote4":
-                            cursor.execute("SELECT option_four_name, option_four_votes FROM voting")
-                        elif json_message["vote"] == "add-vote5":
-                            cursor.execute("SELECT option_five_name, option_five_votes FROM voting")
-                        votes = cursor.fetchall()
-                        current_vote_name = votes[len(votes)-1][0]
-                        current_vote_count = votes[len(votes)-1][1]
-                        current_vote_count += 1
-                        current_vote_count_string = str(current_vote_count)
-                        cursor.close()
-                        json_message["voteName"] = current_vote_name
-                        json_message["voteCount"] = current_vote_count_string
+                        if json_message["vote"] != "end-vote":
+                            connection = mysql.connector.connect(**TCPHandler.config)
+                            cursor = connection.cursor()
+                            if json_message["vote"] == "add-vote1":
+                                cursor.execute("SELECT option_one_name, option_one_votes FROM voting")
+                            elif json_message["vote"] == "add-vote2":
+                                cursor.execute("SELECT option_two_name, option_two_votes FROM voting")
+                            elif json_message["vote"] == "add-vote3":
+                                cursor.execute("SELECT option_three_name, option_three_votes FROM voting")
+                            elif json_message["vote"] == "add-vote4":
+                                cursor.execute("SELECT option_four_name, option_four_votes FROM voting")
+                            elif json_message["vote"] == "add-vote5":
+                                cursor.execute("SELECT option_five_name, option_five_votes FROM voting")
+                            votes = cursor.fetchall()
+                            current_vote_name = votes[len(votes)-1][0]
+                            current_vote_count = votes[len(votes)-1][1]
+                            current_vote_count += 1
+                            current_vote_count_string = str(current_vote_count)
+                            cursor.close()
+                            json_message["voteName"] = current_vote_name
+                            json_message["voteCount"] = current_vote_count_string
+                        else:
+                            TCPHandler.voting_alive = False
                         ws_frame = b''
                         text_byte = 129
                         ws_frame += text_byte.to_bytes(1, "big")

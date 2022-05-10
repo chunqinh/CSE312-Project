@@ -39,10 +39,24 @@ function addVote(vote, voteName, voteCount){
     }
 }
 
+function endVote(){
+    const voteRequest = new XMLHttpRequest();
+    voteRequest.open("GET", "/homepage")
+    voteRequest.send()
+    alert("Voting has ended, Please refresh the page")
+}
+
 socket.onmessage = function (ws_message) {
     const vote = JSON.parse(ws_message.data);
     const voteType = vote.vote;
-    const voteName = vote.voteName;
-    const voteCount = vote.voteCount;
-    addVote(voteType, voteName, voteCount);
+    switch (voteType) {
+        case "end-vote":
+            endVote();
+            break;
+        default:
+            const voteName = vote.voteName;
+            const voteCount = vote.voteCount;
+            addVote(voteType, voteName, voteCount);
+            break;
+    }
 }
