@@ -37,6 +37,7 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 key, value = x.split(": ")
                 head[key] = value
         cookie = ''
+        xsrf_token = ''
         if "Cookie" in head:
             cookie = head["Cookie"]
         print(recievedData)
@@ -371,6 +372,17 @@ class TCPHandler(socketserver.BaseRequestHandler):
                     print("no new message --------------------")
                     response = TCPHandler.generate_response(json.dumps({'sender':'','receiver':'','chat_history':''}).encode(),'application/json; charset=utf-8')
                     self.request.sendall(response)
+
+            elif splitData[1] == b"/get_xsrf_token":
+                connection = mysql.connector.connect(**TCPHandler.config)
+                cursor = connection.cursor()
+                cursor.execute('SELECT xsrf_token FROM user WHERE token = %s', (cookie,))
+                xsrf_token = cursor.fetchone()
+                cursor.close()
+                print('------------------------------------------/get_xsrf_token',xsrf_token)
+                response = TCPHandler.generate_response(json.dumps(xsrf_token[0]).encode(), 'application/json; charset=utf-8', '200 OK')
+                self.request.sendall( response)
+                
             
             # logout
             elif splitData[1] == b"/logout":
@@ -533,6 +545,11 @@ class TCPHandler(socketserver.BaseRequestHandler):
                         cursor.execute('UPDATE user SET token = %s, is_online = True WHERE username = %s',
                         (hash_token.decode(), insert_username,))
                         connection.commit()
+
+                        xsrf_token = secrets.token_urlsafe(20)
+                        cursor.execute('UPDATE user SET xsrf_token = %s WHERE username = %s',(xsrf_token,insert_username,))
+                        connection.commit()
+                        
                         self.request.sendall(("HTTP/1.1 302 Redirect\r\nContent-Length: 0\r\nSet-Cookie: "+ hash_token.decode() +"; Max-Age=3600; HttpOnly\r\nLocation: /homepage \r\n\r\n").encode())
                     else:
                         print("not match")
@@ -609,22 +626,34 @@ class TCPHandler(socketserver.BaseRequestHandler):
                 #     connection.commit()
                 #     cursor.close()
                 # else:
-                cursor.execute("INSERT INTO message(sender_username, content, receiver_username,is_new) VALUES(%s, %s, %s,True)",
-                            (json_string['sender'],json_string['message'], json_string['receiver']))
-                connection.commit()
 
-                cursor.execute('SELECT * FROM message WHERE sender_username = %s',
-                           (json_string['sender'],))
-                message = cursor.fetchall()
-                print(message)
-                cursor.close()
-                response = TCPHandler.generate_response(json.dumps({'result':True}).encode(),'application/json; charset=utf-8')
-                self.request.sendall(response)
-                
+                #check if xsrf_token match
+                xsrf_token = json_string['xsrf_token']
+                cursor.execute('SELECT username FROM user WHERE xsrf_token = %s', (xsrf_token,))
+                username = cursor.fetchone()[0]
+                print('------------------------------------------------------------',username)
+                if username == json_string['sender']:
 
-                # else:
-                #     response = TCPHandler.generate_response(json.dumps({'result':False}).encode(),'application/json; charset=utf-8')
-                #     self.request.sendall(response)
+                    #update database
+                    cursor.execute("INSERT INTO message(sender_username, content, receiver_username,is_new) VALUES(%s, %s, %s,True)",
+                                (json_string['sender'],json_string['message'], json_string['receiver']))
+                    connection.commit()
+
+                    cursor.execute('SELECT * FROM message WHERE sender_username = %s',
+                            (json_string['sender'],))
+                    message = cursor.fetchall()
+                    print(message)
+                    cursor.close()
+                    response = TCPHandler.generate_response(json.dumps({'result':True}).encode(),'application/json; charset=utf-8')
+                    self.request.sendall(response)
+                    
+
+                    # else:
+                    #     response = TCPHandler.generate_response(json.dumps({'result':False}).encode(),'application/json; charset=utf-8')
+                    #     self.request.sendall(response)
+                else:
+                    self.request.sendall(
+                        "HTTP/1.1 403 Forbidden\r\nContent Length: 3\r\nContent-Type: text/html\r\nX-Content-Type-Options: nosniff\r\n\r\n403".encode())
                 
                 
 

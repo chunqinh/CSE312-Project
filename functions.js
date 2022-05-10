@@ -86,6 +86,8 @@ function sendMessage() {
     const message = chatBox.value;
     const sender = document.getElementById("sender").textContent;
     const receiver = document.getElementById("receiver").textContent;
+    const xsrf_token = document.getElementById("xsrf_token").value;
+    console.log(xsrf_token)
     chatBox.value = "";
     // const send_message = document.getElementById("show_send_message");
     const send_message = document.getElementById('chat_history');
@@ -107,7 +109,7 @@ function sendMessage() {
             }
         };
         request.open("POST", "/direct-message");
-        let data = {'sender':sender,'receiver':receiver,'message':message};
+        let data = {'sender':sender,'receiver':receiver,'message':message,'xsrf_token':xsrf_token};
         request.send(JSON.stringify(data));
         
     }
@@ -222,12 +224,26 @@ function escapeHtml(unsafe){
     }
   }
 
+  function get_xsrf_token() {
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            const xsrf_token = JSON.parse(this.response);
+                document.getElementById("xsrf_token").value = xsrf_token;
+        }
+    };
+    request.open("GET", "/get_xsrf_token");
+    request.send();
+}
+
 function welcome() {
 
     fetchMessage();
     setInterval(fetchMessage,1000);
     get_online_users();
     setInterval(get_online_users,1000);
+    get_xsrf_token();
+    // setInterval(get_xsrf_token,1000);
 
 
 }
