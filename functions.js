@@ -4,7 +4,7 @@ const socket = new WebSocket('ws://' + window.location.host + '/homepage_voting/
 // Get the modal
 var modal = document.getElementById("myModal");
 // Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+// var span = document.getElementsByClassName("close")[0];
 
 // var send_message =''
 // var received_message=''
@@ -110,6 +110,14 @@ function addMessage(chatMessage) {
     console.log(chatMessage);
     // chat.innerHTML += "<b>" + chatMessage['sender'] + "</b>: " + chatMessage["message"] + "</br>";
     // + "<br/>"
+    chat.innerHTML += "<p><b>"+escapeHtml(chatMessage['sender']) +"</b>: "  + escapeHtml(chatMessage["message"]) + "</p></br>";
+}
+
+function send_addMessage(chatMessage) {
+    let chat = document.getElementById('chat_history');
+    console.log(chatMessage);
+    // chat.innerHTML += "<b>" + chatMessage['sender'] + "</b>: " + chatMessage["message"] + "</br>";
+    // + "<br/>"
     chat.innerHTML += "<p><b>"+chatMessage['sender'] +"</b>: "  + chatMessage["message"] + "</p></br>";
 }
 
@@ -175,9 +183,11 @@ function onclick_popup(sender, receiver, messages){
     console.log(messages)
     let popup_sender = document.getElementById('sender');
     popup_sender.innerHTML =escapeHtml(sender);
+    // popup_sender.innerHTML =sender;
     // popup_sender.innerHTML =receiver;
     let popup_receiver = document.getElementById('receiver');
     popup_receiver.innerHTML =escapeHtml(receiver);
+    // popup_receiver.innerHTML =receiver;
     // popup_receiver.innerHTML =sender;
     let rece_message = document.getElementById('chat_history')
     rece_message.textContent = '';
@@ -200,16 +210,18 @@ function sent_popup(sender, receiver, messages){
     let popup_sender = document.getElementById('sender');
     // popup_sender.innerHTML =sender;
     popup_sender.innerHTML =escapeHtml(receiver);
+    // popup_sender.innerHTML =receiver;
     let popup_receiver = document.getElementById('receiver');
     // popup_receiver.innerHTML =receiver;
     popup_receiver.innerHTML =escapeHtml(sender);
+    // popup_receiver.innerHTML =sender;
     let rece_message = document.getElementById('chat_history')
     rece_message.textContent = '';
     
     const mess =JSON.parse(messages)
     // console.log(mess)
     for (const message of mess) {
-        addMessage(message);
+        send_addMessage(message);
     }
     
     // rece_message.innerHTML = message
@@ -218,17 +230,17 @@ function sent_popup(sender, receiver, messages){
 }
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    console.log("X")
-    modal.style.display = "none";
-}
+// span.onclick = function() {
+//     console.log("X")
+//     modal.style.display = "none";
+// }
 
 // When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
+// window.onclick = function(event) {
+//     if (event.target == modal) {
+//         modal.style.display = "none";
+//     }
+// }
 
 function escapeHtml(unsafe){
     return unsafe
